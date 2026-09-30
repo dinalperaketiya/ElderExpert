@@ -5,21 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Notification extends Model
+class CompanyProfile extends Model
 {
     protected $fillable = [
         'user_id',
-        'title',
-        'message',
-        'type',
-        'read_at',
+        'company_name',
+        'description',
+        'industry',
+        'location',
+        'website',
+        'company_logo',
     ];
 
-    protected $casts = [
-        'read_at' => 'datetime',
-    ];
-
-    // A notification belongs to one user
+    // A company profile belongs to one user
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
