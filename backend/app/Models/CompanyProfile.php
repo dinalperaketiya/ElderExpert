@@ -14,6 +14,7 @@ class CompanyProfile extends Model
         'industry',
         'location',
         'website',
+        'email',
         'company_logo',
     ];
 
