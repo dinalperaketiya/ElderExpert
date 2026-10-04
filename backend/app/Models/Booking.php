@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Availability;
 
 class Booking extends Model
 {
@@ -12,6 +13,7 @@ class Booking extends Model
         'user_id',
         'expert_id',
         'service_id',
+        'availability_id',
         'booking_date',
         'start_time',
         'end_time',
@@ -47,5 +49,9 @@ class Booking extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+    public function availability(): BelongsTo
+    {
+        return $this->belongsTo(Availability::class, 'availability_id');
     }
 }

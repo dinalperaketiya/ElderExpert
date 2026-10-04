@@ -8,6 +8,7 @@ use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\YoungProfessionalProfileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AvailabilityController;
+use App\Http\Controllers\BookingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -44,3 +45,9 @@ Route::get('/availability/{id}', [AvailabilityController::class, 'show']);
 Route::post('/availability', [AvailabilityController::class, 'store']);
 Route::put('/availability/{id}', [AvailabilityController::class, 'update']);
 Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy']);
+
+Route::get('/bookings', [BookingController::class, 'index']);
+Route::get('/bookings/{id}', [BookingController::class, 'show']);
+Route::post('/bookings', [BookingController::class, 'store']);
+Route::put('/bookings/{id}', [BookingController::class, 'update']);
+Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);
