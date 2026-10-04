@@ -9,6 +9,7 @@ use App\Http\Controllers\YoungProfessionalProfileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -51,3 +52,9 @@ Route::get('/bookings/{id}', [BookingController::class, 'show']);
 Route::post('/bookings', [BookingController::class, 'store']);
 Route::put('/bookings/{id}', [BookingController::class, 'update']);
 Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);
+
+Route::get('/payments', [PaymentController::class, 'index']);
+Route::get('/payments/{id}', [PaymentController::class, 'show']);
+Route::post('/payments', [PaymentController::class, 'store']);
+Route::put('/payments/{id}', [PaymentController::class, 'update']);
+Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
