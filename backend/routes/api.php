@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\ExpertProfileController;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\YoungProfessionalProfileController;
-
+use App\Http\Controllers\ServiceController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -30,3 +30,9 @@ Route::get('/young-professionals/{id}', [YoungProfessionalProfileController::cla
 Route::post('/young-professionals', [YoungProfessionalProfileController::class, 'store']);
 Route::put('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'update']);
 Route::delete('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'destroy']);
+
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{id}', [ServiceController::class, 'show']);
+Route::post('/services', [ServiceController::class, 'store']);
+Route::put('/services/{id}', [ServiceController::class, 'update']);
+Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
