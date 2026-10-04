@@ -11,6 +11,7 @@ use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\MessageController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -65,3 +66,9 @@ Route::get('/reviews/{id}', [ReviewController::class, 'show']);
 Route::post('/reviews', [ReviewController::class, 'store']);
 Route::put('/reviews/{id}', [ReviewController::class, 'update']);
 Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
+Route::get('/messages', [MessageController::class, 'index']);
+Route::get('/messages/{id}', [MessageController::class, 'show']);
+Route::post('/messages', [MessageController::class, 'store']);
+Route::put('/messages/{id}', [MessageController::class, 'update']);
+Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
