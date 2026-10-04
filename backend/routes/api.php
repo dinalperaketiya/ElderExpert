@@ -12,6 +12,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -72,3 +73,9 @@ Route::get('/messages/{id}', [MessageController::class, 'show']);
 Route::post('/messages', [MessageController::class, 'store']);
 Route::put('/messages/{id}', [MessageController::class, 'update']);
 Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
+
+Route::get('/notifications', [NotificationController::class, 'index']);
+Route::get('/notifications/{id}', [NotificationController::class, 'show']);
+Route::post('/notifications', [NotificationController::class, 'store']);
+Route::put('/notifications/{id}', [NotificationController::class, 'update']);
+Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
