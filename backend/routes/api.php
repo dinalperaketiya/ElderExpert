@@ -7,6 +7,8 @@ use App\Http\Controllers\ExpertProfileController;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\YoungProfessionalProfileController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\AvailabilityController;
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -36,3 +38,9 @@ Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::post('/services', [ServiceController::class, 'store']);
 Route::put('/services/{id}', [ServiceController::class, 'update']);
 Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+
+Route::get('/availability', [AvailabilityController::class, 'index']);
+Route::get('/availability/{id}', [AvailabilityController::class, 'show']);
+Route::post('/availability', [AvailabilityController::class, 'store']);
+Route::put('/availability/{id}', [AvailabilityController::class, 'update']);
+Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy']);
