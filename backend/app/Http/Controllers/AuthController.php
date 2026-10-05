@@ -16,12 +16,14 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:expert,company,young_professional',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
         ]);
 
         $token = $user->createToken('elderexpert-token')->plainTextToken;
