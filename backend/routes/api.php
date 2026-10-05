@@ -46,7 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ======================================
 
     Route::get('/experts', [ExpertProfileController::class, 'index']);
-    Route::get('/experts/{id}', [ExpertProfileController::class, 'show']);
+    Route::get('/experts/{id}', [ExpertProfileController::class, 'show'])
+        ->middleware('role:expert,admin');;
     Route::post('/experts', [ExpertProfileController::class, 'store']);
     Route::put('/experts/{id}', [ExpertProfileController::class, 'update']);
     Route::delete('/experts/{id}', [ExpertProfileController::class, 'destroy']);
