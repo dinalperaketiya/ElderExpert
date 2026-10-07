@@ -27,7 +27,7 @@ Route::get('/test', [TestController::class, 'test']);
 
 // Authentication
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 
 // ==========================================

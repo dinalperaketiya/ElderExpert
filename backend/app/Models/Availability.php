@@ -12,9 +12,15 @@ class Availability extends Model
     protected $fillable = [
         'expert_id',
         'day_of_week',
+        'available_date',
         'start_time',
         'end_time',
         'is_available',
+    ];
+
+    protected $casts = [
+        'available_date' => 'date',
+        'is_available' => 'boolean',
     ];
 
     // An availability record belongs to one expert
