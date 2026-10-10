@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Video, Award, Clock, ArrowRight, UserCheck, Sparkles, FileText } from 'lucide-react';
+import { BookOpen, FileText, ArrowRight, Award } from 'lucide-react';
 
 export default function KnowledgeHub({ onBookSession }) {
   const articles = [
@@ -33,50 +33,50 @@ export default function KnowledgeHub({ onBookSession }) {
   ];
 
   return (
-    <section className="py-16 bg-slate-950 text-slate-100">
+    <section className="py-16 bg-slate-50 text-slate-900 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
-            <BookOpen className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-100 text-sky-800 text-sm font-extrabold">
+            <BookOpen className="w-5 h-5 text-sky-600" />
             <span>Preserving Institutional Wisdom</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Knowledge Hub & Masterclasses
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Knowledge Hub & Veteran Masterclasses
           </h2>
-          <p className="text-slate-400 text-sm">
-            Read exclusive teardowns, strategic playbooks, and case studies authored by veteran executives and principal scientists.
+          <p className="text-slate-700 text-base font-medium">
+            Read technical playbooks, case studies, and strategic advisory notes published by retired industry leaders.
           </p>
         </div>
 
-        {/* Featured Case Studies Grid */}
+        {/* Featured Masterclasses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {articles.map((art) => (
             <div
               key={art.id}
-              className="glass-card glass-card-hover rounded-3xl overflow-hidden border border-slate-800 flex flex-col justify-between"
+              className="bg-white rounded-3xl overflow-hidden border-2 border-slate-200 shadow-lg hover:border-sky-500 transition-all flex flex-col justify-between"
             >
               <div>
                 <img
                   src={art.image}
                   alt={art.title}
-                  className="w-full h-48 object-cover border-b border-slate-800"
+                  className="w-full h-48 object-cover border-b border-slate-200"
                 />
 
                 <div className="p-6 space-y-4">
-                  <div className="flex items-center justify-between text-xs text-sky-400 font-bold">
+                  <div className="flex items-center justify-between text-xs font-black text-sky-700 uppercase">
                     <span>{art.category}</span>
-                    <span className="text-slate-400 font-normal">{art.readTime}</span>
+                    <span className="text-slate-500 font-bold">{art.readTime}</span>
                   </div>
 
-                  <h3 className="text-lg font-extrabold text-white leading-snug hover:text-sky-400 transition-colors cursor-pointer">
+                  <h3 className="text-xl font-extrabold text-slate-900 leading-snug hover:text-sky-600 transition-colors cursor-pointer">
                     {art.title}
                   </h3>
 
-                  <div className="pt-2 border-t border-slate-800/80">
-                    <p className="text-xs font-bold text-white">{art.author}</p>
-                    <p className="text-[11px] text-slate-400">{art.role}</p>
+                  <div className="pt-3 border-t border-slate-200">
+                    <p className="text-sm font-extrabold text-slate-900">{art.author}</p>
+                    <p className="text-xs font-semibold text-slate-600">{art.role}</p>
                   </div>
                 </div>
               </div>
@@ -84,9 +84,9 @@ export default function KnowledgeHub({ onBookSession }) {
               <div className="p-6 pt-0">
                 <button
                   onClick={onBookSession}
-                  className="w-full py-2.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white text-xs border border-slate-700 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl font-extrabold bg-slate-100 hover:bg-sky-600 hover:text-white text-slate-800 text-sm border border-slate-200 transition-all flex items-center justify-center gap-2"
                 >
-                  <FileText className="w-3.5 h-3.5 text-sky-400" />
+                  <FileText className="w-4 h-4 text-sky-600" />
                   <span>Read Full Masterclass</span>
                 </button>
               </div>

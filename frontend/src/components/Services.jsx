@@ -1,5 +1,5 @@
 import React from 'react';
-import { PhoneCall, FileCode, Award, Users, CheckCircle2, ArrowRight, ShieldCheck, Briefcase } from 'lucide-react';
+import { PhoneCall, FileCode, Award, Users, CheckCircle2, ArrowRight, Briefcase } from 'lucide-react';
 
 export default function Services({ onBookService }) {
   const serviceItems = [
@@ -42,20 +42,20 @@ export default function Services({ onBookService }) {
   ];
 
   return (
-    <section className="py-16 bg-slate-900 text-slate-100">
+    <section className="py-16 bg-slate-100 text-slate-900 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase">
-            <Briefcase className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-100 text-sky-800 text-sm font-extrabold">
+            <Briefcase className="w-5 h-5 text-sky-600" />
             <span>Advisory Engagement Models</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            How Organizations Hire Elder Experts
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            How Companies Hire Retired Experts
           </h2>
-          <p className="text-slate-400 text-sm">
-            Flexible, high-impact engagement models tailored for startups, corporations, and young professionals.
+          <p className="text-slate-700 text-base font-medium">
+            Flexible, high-impact engagement models designed for startups, corporate teams, and young professionals.
           </p>
         </div>
 
@@ -66,39 +66,39 @@ export default function Services({ onBookService }) {
             return (
               <div
                 key={service.id}
-                className="glass-card glass-card-hover p-8 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between"
+                className="bg-white p-8 rounded-3xl border-2 border-slate-200 shadow-lg space-y-6 flex flex-col justify-between hover:border-sky-500 transition-all"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                    <div className="w-14 h-14 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
                       <Icon className="w-7 h-7" />
                     </div>
-                    <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-800 text-emerald-400 border border-slate-700">
+                    <span className="text-xs font-black px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                       {service.price}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white">{service.title}</h3>
-                  <p className="text-xs font-semibold text-sky-400">{service.duration}</p>
-                  <p className="text-sm text-slate-300 leading-relaxed">{service.desc}</p>
+                  <h3 className="text-2xl font-extrabold text-slate-900">{service.title}</h3>
+                  <p className="text-xs font-black text-sky-700 uppercase tracking-wider">{service.duration}</p>
+                  <p className="text-base text-slate-700 leading-relaxed font-medium">{service.desc}</p>
 
                   <div className="space-y-2 pt-2">
                     {service.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-xs font-medium text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <div key={idx} className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
                         <span>{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-slate-800">
+                <div className="pt-6 border-t border-slate-200">
                   <button
                     onClick={() => onBookService(service)}
-                    className="w-full py-3.5 rounded-xl font-bold bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white border border-slate-700 hover:border-emerald-500 transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+                    className="w-full py-4 rounded-2xl font-extrabold bg-sky-600 hover:bg-sky-700 text-white transition-all text-sm flex items-center justify-center gap-2 shadow-md shadow-sky-600/20"
                   >
                     <span>Request Engagement</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
