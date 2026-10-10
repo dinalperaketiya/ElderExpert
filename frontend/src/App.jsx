@@ -1,100 +1,90 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import VitalsDashboard from './components/VitalsDashboard';
-import Caregivers from './components/Caregivers';
+import Caregivers from './components/Caregivers'; // Experts Directory
+import AiMatchEngine from './components/AiMatchEngine';
 import Services from './components/Services';
-import EmergencyModal from './components/EmergencyModal';
+import KnowledgeHub from './components/KnowledgeHub';
 import BookingModal from './components/BookingModal';
-import AddVitalModal from './components/AddVitalModal';
+import JoinExpertModal from './components/JoinExpertModal';
 import Footer from './components/Footer';
 
-import { initialCaregivers, initialVitals, initialMedications } from './services/api';
+import { initialExperts } from './services/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [caregivers] = useState(initialCaregivers);
-  const [vitals, setVitals] = useState(initialVitals);
-  const [medications, setMedications] = useState(initialMedications);
+  const [activeTab, setActiveTab] = useState('experts');
+  const [experts] = useState(initialExperts);
+  const [searchFilter, setSearchFilter] = useState('');
 
   // Modals state
-  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isAddVitalOpen, setIsAddVitalOpen] = useState(false);
+  const [isJoinOpen, setIsJoinOpen] = useState(false);
 
-  const [selectedCaregiver, setSelectedCaregiver] = useState(null);
+  const [selectedExpert, setSelectedExpert] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
 
-  const handleOpenBookingForCaregiver = (caregiver) => {
-    setSelectedCaregiver(caregiver);
+  const handleOpenBookingForExpert = (expert) => {
+    setSelectedExpert(expert);
     setSelectedService(null);
     setIsBookingOpen(true);
   };
 
   const handleOpenBookingForService = (service) => {
     setSelectedService(service);
-    setSelectedCaregiver(null);
+    setSelectedExpert(null);
     setIsBookingOpen(true);
   };
 
-  const handleAddVital = (newVital) => {
-    setVitals([newVital, ...vitals]);
+  const handleHeroSearch = (query) => {
+    setSearchFilter(query);
+    setActiveTab('experts');
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white font-sans">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between selection:bg-sky-500 selection:text-slate-950 font-sans">
       
-      {/* Top Navbar */}
+      {/* Navbar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenEmergency={() => setIsEmergencyOpen(true)}
-        onOpenProfile={() => alert('ElderExpert Patient Account: Eleanor Vance\nStatus: Active Care Plan')}
+        onOpenJoinModal={() => setIsJoinOpen(true)}
+        onOpenPostProject={() => {
+          setSelectedExpert(null);
+          setSelectedService(null);
+          setIsBookingOpen(true);
+        }}
       />
 
-      {/* Main Content Body dependent on activeTab */}
+      {/* Main View dependent on activeTab */}
       <main className="flex-1">
-        {activeTab === 'home' && (
+        {activeTab === 'experts' && (
           <>
             <Hero
-              onExploreCaregivers={() => setActiveTab('caregivers')}
-              onOpenVitals={() => setActiveTab('vitals')}
-              onBookService={() => setIsBookingOpen(true)}
-            />
-            <VitalsDashboard
-              vitals={vitals}
-              setVitals={setVitals}
-              medications={medications}
-              setMedications={setMedications}
-              onAddVital={() => setIsAddVitalOpen(true)}
+              onSearchQuery={handleHeroSearch}
+              onExploreClick={() => setActiveTab('experts')}
+              onPostProjectClick={() => setIsBookingOpen(true)}
             />
             <Caregivers
-              caregivers={caregivers}
-              onSelectCaregiver={handleOpenBookingForCaregiver}
+              experts={experts}
+              onSelectExpert={handleOpenBookingForExpert}
+              searchFilter={searchFilter}
+            />
+            <AiMatchEngine
+              onSelectExpert={handleOpenBookingForExpert}
             />
             <Services
               onBookService={handleOpenBookingForService}
             />
+            <KnowledgeHub
+              onBookSession={() => setIsBookingOpen(true)}
+            />
           </>
         )}
 
-        {activeTab === 'vitals' && (
+        {activeTab === 'aimatch' && (
           <div className="py-8">
-            <VitalsDashboard
-              vitals={vitals}
-              setVitals={setVitals}
-              medications={medications}
-              setMedications={setMedications}
-              onAddVital={() => setIsAddVitalOpen(true)}
-            />
-          </div>
-        )}
-
-        {activeTab === 'caregivers' && (
-          <div className="py-8">
-            <Caregivers
-              caregivers={caregivers}
-              onSelectCaregiver={handleOpenBookingForCaregiver}
+            <AiMatchEngine
+              onSelectExpert={handleOpenBookingForExpert}
             />
           </div>
         )}
@@ -106,32 +96,34 @@ export default function App() {
             />
           </div>
         )}
+
+        {activeTab === 'knowledge' && (
+          <div className="py-8">
+            <KnowledgeHub
+              onBookSession={() => setIsBookingOpen(true)}
+            />
+          </div>
+        )}
       </main>
 
       {/* Footer */}
       <Footer />
 
-      {/* Interactive Modals */}
-      <EmergencyModal
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
-      />
-
+      {/* Modals */}
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => {
           setIsBookingOpen(false);
-          setSelectedCaregiver(null);
+          setSelectedExpert(null);
           setSelectedService(null);
         }}
-        selectedCaregiver={selectedCaregiver}
+        selectedExpert={selectedExpert}
         selectedService={selectedService}
       />
 
-      <AddVitalModal
-        isOpen={isAddVitalOpen}
-        onClose={() => setIsAddVitalOpen(false)}
-        onAdd={handleAddVital}
+      <JoinExpertModal
+        isOpen={isJoinOpen}
+        onClose={() => setIsJoinOpen(false)}
       />
 
     </div>
