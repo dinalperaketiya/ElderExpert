@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, ShieldCheck, MapPin, Award, Filter, Search, Calendar, Sparkles, Building, Briefcase, ChevronRight } from 'lucide-react';
+import { Star, ShieldCheck, MapPin, Award, Filter, Search, Calendar, Sparkles, Building2, Briefcase, ArrowRight } from 'lucide-react';
 
 export default function Caregivers({ experts, onSelectExpert, searchFilter }) {
   const [searchTerm, setSearchTerm] = useState(searchFilter || '');
@@ -24,48 +24,48 @@ export default function Caregivers({ experts, onSelectExpert, searchFilter }) {
   });
 
   return (
-    <section className="py-16 bg-slate-950 text-slate-100">
+    <section className="py-16 bg-slate-100 text-slate-900 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-800 pb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-300 pb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase mb-2">
-              <Award className="w-3.5 h-3.5" />
-              <span>Verified Retired Industry Leaders</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-extrabold uppercase mb-2">
+              <Award className="w-4 h-4 text-sky-600" />
+              <span>Verified Senior Industry Leaders</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Explore Senior Experts & Advisors
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Directory of Veteran Experts
             </h2>
-            <p className="text-slate-400 text-sm mt-1">
-              Hire retired executives, veteran principal engineers, and domain authorities for short-term consulting and mentorship.
+            <p className="text-slate-700 text-base font-semibold mt-1">
+              Connect with retired executives and senior principal engineers for short-term advisory and mentorship.
             </p>
           </div>
 
           {/* Search Bar */}
           <div className="relative min-w-[320px]">
-            <Search className="w-4.5 h-4.5 text-sky-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Filter by skill, company, or domain..."
+              placeholder="Search by skill, company, or name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900 border border-slate-700/80 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-all"
+              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white border-2 border-slate-300 text-base font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-600 shadow-sm"
             />
           </div>
         </div>
 
-        {/* Domain Filters */}
+        {/* Domain Filter Buttons */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <Filter className="w-4 h-4 text-slate-500 flex-shrink-0 mr-1" />
+          <Filter className="w-5 h-5 text-slate-500 flex-shrink-0 mr-1" />
           {domains.map((dom) => (
             <button
               key={dom}
               onClick={() => setSelectedDomain(dom)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`px-5 py-3 rounded-2xl text-sm font-extrabold whitespace-nowrap transition-all ${
                 selectedDomain === dom
-                  ? 'bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 shadow-md shadow-sky-500/20 font-extrabold'
-                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
+                  ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-300'
               }`}
             >
               {dom}
@@ -78,61 +78,60 @@ export default function Caregivers({ experts, onSelectExpert, searchFilter }) {
           {filteredExperts.map((expert) => (
             <div
               key={expert.id}
-              className="glass-card glass-card-hover rounded-3xl p-6 sm:p-7 border border-slate-800 flex flex-col justify-between space-y-6 relative overflow-hidden"
+              className="bg-white rounded-3xl p-7 border-2 border-slate-200 shadow-lg space-y-6 hover:border-sky-500 transition-all flex flex-col justify-between"
             >
               
-              {/* Top Header: Avatar + Match Score + Rating */}
+              {/* Top Header: Photo + Title + AI Score */}
               <div className="flex items-start gap-4">
                 <div className="relative flex-shrink-0">
                   <img
                     src={expert.avatar}
                     alt={expert.name}
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-slate-700"
+                    className="w-20 h-20 rounded-2xl object-cover border-2 border-sky-600"
                   />
                   {expert.verified && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-slate-950 shadow-md" title="Verified Senior Expert">
-                      <ShieldCheck className="w-4 h-4" />
+                    <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-md" title="Verified Senior Expert">
+                      <ShieldCheck className="w-5 h-5" />
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
+                    <h3 className="text-xl font-extrabold text-slate-900">
                       {expert.name}
                     </h3>
                     
-                    {/* AI Score Badge */}
-                    <div className="flex items-center gap-1.5 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20 text-xs font-bold text-sky-400">
-                      <Sparkles className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 bg-sky-100 px-3 py-1 rounded-full text-xs font-black text-sky-800 border border-sky-200">
+                      <Sparkles className="w-3.5 h-3.5 text-sky-600" />
                       <span>{expert.aiMatchScore}% Match</span>
                     </div>
                   </div>
 
-                  <p className="text-xs font-bold text-emerald-400">{expert.title}</p>
+                  <p className="text-sm font-extrabold text-sky-700">{expert.title}</p>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-400 pt-1">
-                    <span className="flex items-center gap-1 font-medium text-slate-300">
-                      <Building className="w-3.5 h-3.5 text-slate-500" /> {expert.formerCompany}
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-slate-600 pt-1">
+                    <span className="flex items-center gap-1 text-slate-800">
+                      <Building2 className="w-4 h-4 text-slate-500" /> {expert.formerCompany}
                     </span>
-                    <span className="flex items-center gap-1 font-medium text-slate-300">
-                      <Award className="w-3.5 h-3.5 text-slate-500" /> {expert.experienceYears} Yrs Exp
+                    <span className="flex items-center gap-1 text-slate-800">
+                      <Award className="w-4 h-4 text-slate-500" /> {expert.experienceYears} Yrs Exp
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Bio & Skills Tags */}
+              {/* Bio & Skill Tags */}
               <div className="space-y-3">
-                <p className="text-xs text-slate-300 leading-relaxed italic">
+                <p className="text-sm text-slate-700 leading-relaxed font-medium italic bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   "{expert.bio}"
                 </p>
 
-                <div className="flex flex-wrap items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-2">
                   {expert.skills.map((skill, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-semibold text-sky-400"
+                      className="px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-extrabold text-slate-800"
                     >
                       {skill}
                     </span>
@@ -140,27 +139,27 @@ export default function Caregivers({ experts, onSelectExpert, searchFilter }) {
                 </div>
               </div>
 
-              {/* Pricing & Booking Action */}
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+              {/* Pricing & Booking Button */}
+              <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-slate-400 block font-semibold">Consulting Rate</span>
-                  <div className="text-xl font-extrabold text-white">
-                    ${expert.hourlyRate} <span className="text-xs text-slate-400 font-normal">/ hr</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase block">Consulting Rate</span>
+                  <div className="text-2xl font-black text-slate-900">
+                    ${expert.hourlyRate} <span className="text-xs font-bold text-slate-500">/ hr</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-1 text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" />
+                  <div className="hidden sm:flex items-center gap-1 text-xs font-extrabold text-amber-800 bg-amber-100 px-3 py-1 rounded-xl border border-amber-200">
+                    <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                     <span>{expert.rating}</span>
                   </div>
 
                   <button
                     onClick={() => onSelectExpert(expert)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all text-xs shadow-md shadow-emerald-500/20"
+                    className="flex items-center gap-2 px-6 py-3 rounded-2xl font-extrabold bg-sky-600 hover:bg-sky-700 text-white text-sm transition-all shadow-md shadow-sky-600/20"
                   >
-                    <Calendar className="w-4 h-4 text-slate-950" />
-                    <span>Book Advisory Session</span>
+                    <Calendar className="w-4 h-4" />
+                    <span>Book Advisory Call</span>
                   </button>
                 </div>
               </div>
