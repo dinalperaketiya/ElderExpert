@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sparkles, Award, ArrowRight, Search, ShieldCheck, CheckCircle2, Building, BrainCircuit, Users } from 'lucide-react';
+import { Search, Sparkles, UserCheck, Building2, ShieldCheck, Award, HeartHandshake, ArrowRight } from 'lucide-react';
 
-export default function Hero({ onSearchQuery, onExploreClick, onPostProjectClick }) {
+export default function Hero({ onSearchQuery, onOpenLoginModal }) {
   const [query, setQuery] = useState('');
 
   const handleSearchSubmit = (e) => {
@@ -10,146 +10,139 @@ export default function Hero({ onSearchQuery, onExploreClick, onPostProjectClick
   };
 
   return (
-    <section className="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950">
+    <section className="relative overflow-hidden py-16 lg:py-24 bg-slate-50 border-b border-slate-200">
       
-      {/* Glow Backdrops */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-sky-500/10 blur-[150px] rounded-full pointer-events-none"></div>
-      <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+      {/* Background Image Layer: User's Uploaded Office Collaboration Photo */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none"
+        style={{ backgroundImage: `url('/office-bg.jpg')` }}
+      ></div>
+      
+      {/* Light Overlay Gradient for high text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-slate-50/90 to-slate-100/95 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        {/* Top Announcement Pill */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-100 border border-sky-200 text-sky-800 text-sm font-extrabold">
+          <HeartHandshake className="w-5 h-5 text-sky-600" />
+          <span>Bridging Generations — Senior Knowledge & Executive Advisory Platform</span>
+        </div>
+
+        {/* Hero Main Headline */}
+        <div className="max-w-4xl space-y-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+            Connecting Retired Industry Legends with <span className="text-sky-600">Companies & Mentees</span>.
+          </h1>
+
+          <p className="text-xl sm:text-2xl text-slate-700 leading-relaxed font-semibold">
+            ElderExpert provides retired professionals an easy, rewarding way to share decades of wisdom, earn consulting income, and mentor the next generation.
+          </p>
+        </div>
+
+        {/* Dual Portal Action Cards (Elder Experts vs Companies) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
           
-          {/* Hero Left Text & Search */}
-          <div className="lg:col-span-7 space-y-8">
-            
-            {/* AI Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-wider">
-              <BrainCircuit className="w-4 h-4 text-sky-400 animate-pulse" />
-              <span>AI-Powered Intergenerational Knowledge Marketplace</span>
+          {/* Card 1: For Retired Senior Experts */}
+          <div className="bg-white rounded-3xl p-8 border-2 border-sky-200 shadow-xl space-y-6 hover:border-sky-500 transition-all">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-sky-600 text-white flex items-center justify-center shadow-md">
+                <UserCheck className="w-8 h-8" />
+              </div>
+              <div>
+                <span className="text-xs font-black text-sky-700 uppercase tracking-wider block">For Retired Professionals</span>
+                <h3 className="text-2xl font-extrabold text-slate-900">Are You a Senior Expert?</h3>
+              </div>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Unlock Decades of Experience. <span className="gradient-text">Hire Veteran Experts</span> On Demand.
-            </h1>
-
-            {/* Subtext */}
-            <p className="text-lg text-slate-300 leading-relaxed max-w-2xl">
-              ElderExpert connects companies, startups, and young professionals with retired senior executives, lead engineers, and domain specialists for short-term consulting, mentorship, and technical reviews.
+            <p className="text-base text-slate-600 leading-relaxed font-medium">
+              Share your industry expertise, set your own flexible hours, mentor young professionals, and earn advisory income.
             </p>
 
-            {/* Interactive AI Search bar */}
-            <form onSubmit={handleSearchSubmit} className="p-2 rounded-2xl glass-card border border-slate-700/80 shadow-2xl flex flex-col sm:flex-row items-center gap-2">
-              <div className="flex-1 flex items-center gap-3 px-3 w-full">
-                <Search className="w-5 h-5 text-sky-400 flex-shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Describe your need (e.g., Retired Chip Architect for semiconductor review)..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full bg-transparent border-none text-sm text-white placeholder-slate-400 focus:outline-none py-2"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 whitespace-nowrap"
-              >
-                <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>AI Match Expert</span>
-              </button>
-            </form>
-
-            {/* Quick search tags */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-              <span className="font-semibold text-slate-300">Popular Queries:</span>
-              {['Semiconductor Architecture', 'FDA Regulatory Audit', 'Series A Pitch Review', 'Supply Chain Optimization'].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => { setQuery(tag); onSearchQuery(tag); }}
-                  className="px-3 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/50 transition-colors"
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-
-            {/* Stats row */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-slate-800">
-              <div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white">10,000+</div>
-                <div className="text-xs sm:text-sm text-slate-400 font-medium">Verified Veteran Experts</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400">38+ Yrs</div>
-                <div className="text-xs sm:text-sm text-slate-400 font-medium">Average Industry Experience</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-sky-400">98.6%</div>
-                <div className="text-xs sm:text-sm text-slate-400 font-medium">AI Match Accuracy</div>
-              </div>
-            </div>
-
+            <button
+              onClick={() => onOpenLoginModal('expert')}
+              className="w-full py-4 rounded-2xl font-extrabold bg-sky-600 hover:bg-sky-700 text-white text-base shadow-lg shadow-sky-600/20 flex items-center justify-center gap-3 transition-all"
+            >
+              <span>Join as Senior Expert / Mentor</span>
+              <ArrowRight className="w-6 h-6" />
+            </button>
           </div>
 
-          {/* Hero Right Visual Card */}
-          <div className="lg:col-span-5 relative">
-            <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-6 border border-slate-700/80 shadow-2xl relative overflow-hidden">
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                  <Sparkles className="w-4 h-4 animate-spin" />
-                  <span>AI Matching Highlight</span>
-                </div>
-                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
-                  98% Match Score
-                </span>
+          {/* Card 2: For Companies & Hirers */}
+          <div className="bg-white rounded-3xl p-8 border-2 border-emerald-200 shadow-xl space-y-6 hover:border-emerald-500 transition-all">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                <Building2 className="w-8 h-8" />
               </div>
-
-              {/* Expert Preview inside Card */}
-              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-4">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150"
-                    alt="Dr. Arthur Pendelton"
-                    className="w-14 h-14 rounded-2xl object-cover border-2 border-emerald-400"
-                  />
-                  <div>
-                    <h4 className="font-bold text-white text-base">Dr. Arthur Pendelton</h4>
-                    <p className="text-xs text-sky-400 font-semibold">Former VP of Semiconductor Architecture</p>
-                    <p className="text-xs text-slate-400">42 Years Exp | Intel & AMD (Retired)</p>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-900/90 text-xs text-slate-300 border border-slate-800 space-y-1">
-                  <span className="text-emerald-400 font-bold block">Why AI Matched This Expert:</span>
-                  <p>"Top 0.1% authority in microarchitecture design, holding 14 patents in CPU execution units."</p>
-                </div>
+              <div>
+                <span className="text-xs font-black text-emerald-700 uppercase tracking-wider block">For Organizations & Startups</span>
+                <h3 className="text-2xl font-extrabold text-slate-900">Need Expert Guidance?</h3>
               </div>
+            </div>
 
-              {/* Action buttons inside card */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={onExploreClick}
-                  className="py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white text-xs border border-slate-700 flex items-center justify-center gap-1.5"
-                >
-                  <Users className="w-4 h-4 text-sky-400" />
-                  <span>Browse Directory</span>
-                </button>
+            <p className="text-base text-slate-600 leading-relaxed font-medium">
+              Hire verified veteran executives for short-term projects, technical code/chip reviews, and board advisory seats.
+            </p>
 
-                <button
-                  onClick={onPostProjectClick}
-                  className="py-3 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20"
-                >
-                  <Building className="w-4 h-4 text-slate-950" />
-                  <span>Post Project Need</span>
-                </button>
-              </div>
+            <button
+              onClick={() => onOpenLoginModal('company')}
+              className="w-full py-4 rounded-2xl font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white text-base shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-3 transition-all"
+            >
+              <span>Hire a Senior Industry Advisor</span>
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
 
+        </div>
+
+        {/* Easy Search Bar */}
+        <div className="max-w-4xl bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-lg space-y-3">
+          <label className="block text-sm font-extrabold text-slate-900">
+            🔍 Search Retired Experts by Skill or Industry
+          </label>
+
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-3">
+            <input
+              type="text"
+              placeholder="E.g., Semiconductor VP, Clinical FDA Expert, M&A Finance Director..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-300 text-base font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-600 focus:bg-white"
+            />
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-extrabold bg-slate-900 hover:bg-slate-800 text-white text-base transition-all shadow-md"
+            >
+              Find Experts Now
+            </button>
+          </form>
+        </div>
+
+        {/* Senior Trust Badges */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-slate-200 max-w-5xl">
+          <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <ShieldCheck className="w-8 h-8 text-sky-600 flex-shrink-0" />
+            <div>
+              <div className="text-base font-extrabold text-slate-900">100% Verified Credentials</div>
+              <div className="text-xs text-slate-600">Executive background checked</div>
             </div>
           </div>
 
+          <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <Award className="w-8 h-8 text-emerald-600 flex-shrink-0" />
+            <div>
+              <div className="text-base font-extrabold text-slate-900">35+ Years Avg. Experience</div>
+              <div className="text-xs text-slate-600">Battle-tested industry wisdom</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <Sparkles className="w-8 h-8 text-indigo-600 flex-shrink-0" />
+            <div>
+              <div className="text-base font-extrabold text-slate-900">AI Match Guarantee</div>
+              <div className="text-xs text-slate-600">Smart project recommendation</div>
+            </div>
+          </div>
         </div>
 
       </div>
