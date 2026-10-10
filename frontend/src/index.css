@@ -2,28 +2,36 @@
 
 @layer base {
   :root {
-    --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    --color-navy: #123B5D;
+    --color-primary: #2563EB;
+    --color-light-blue: #EAF4FF;
+    --color-text-main: #334155;
+    --color-text-muted: #475569;
+    --color-border: #E2E8F0;
+    --color-verified: #0F766E;
   }
-  
+
   body {
-    font-family: var(--font-main);
-    background-color: #f8fafc;
-    color: #0f172a;
+    font-family: var(--font-body);
+    color: var(--color-text-main);
+    background-color: #FFFFFF;
+    line-height: 1.6;
     overflow-x: hidden;
-    /* High Visibility Office Collaboration Photo Background */
-    background-image: 
-      linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 252, 0.65) 50%, rgba(241, 245, 249, 0.85) 100%),
-      url('/office-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-navy);
+    line-height: 1.25;
   }
 }
 
-/* Accessible Font Sizing classes */
+/* Accessibility: Senior Font Scaling */
 .font-size-normal {
-  font-size: 16px;
+  font-size: 17px;
 }
 .font-size-large {
   font-size: 19px;
@@ -32,45 +40,45 @@
   font-size: 22px;
 }
 
-/* Custom scrollbar */
+/* Accessible Interactive Elements */
+button, a, input, select, textarea {
+  min-height: 48px;
+}
+
+/* Custom senior-friendly scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 5px;
+  background: #CBD5E1;
+  border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #94A3B8;
 }
 
-/* Light mode card design */
-.light-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 2px solid #cbd5e1;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 3px solid #2563EB;
+  outline-offset: 2px;
 }
 
-.light-card-hover {
-  transition: all 0.25s ease-in-out;
-}
-.light-card-hover:hover {
-  border-color: #0284c7;
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px -4px rgba(2, 132, 199, 0.15);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #0284c7 0%, #0d9488 50%, #4f46e5 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Clean Card Utility */
+.ee-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px -2px rgba(18, 59, 93, 0.05), 0 2px 4px -1px rgba(18, 59, 93, 0.03);
 }
 
-.gradient-btn {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+.ee-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.ee-card-hover:hover {
+  border-color: #93C5FD;
+  box-shadow: 0 12px 24px -4px rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
 }
