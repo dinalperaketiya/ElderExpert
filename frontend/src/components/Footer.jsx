@@ -1,75 +1,108 @@
 import React from 'react';
-import { Award, Mail, Phone, ExternalLink, ShieldCheck, Heart, BrainCircuit } from 'lucide-react';
+import { Award, Mail, Phone, ShieldCheck, Heart, ArrowRight } from 'lucide-react';
 
-export default function Footer() {
+export default function Footer({ onJoinExpert, onFindExperts }) {
   return (
-    <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        
+    <footer className="bg-slate-50 border-t border-slate-200 text-[#334155]">
+      
+      {/* Welcoming Pre-Footer Call to Action Banner */}
+      <div className="bg-[#123B5D] text-white py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Ready to Connect Experience with Opportunity?
+            </h3>
+            <p className="text-blue-100 text-base max-w-xl">
+              Join thousands of retired industry leaders and organizations building the future together.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              onClick={onJoinExpert}
+              className="px-6 py-3.5 rounded-xl text-base font-semibold bg-[#2563EB] hover:bg-blue-600 text-white shadow-sm transition-colors"
+            >
+              Join as an Expert
+            </button>
+            <button
+              onClick={onFindExperts}
+              className="px-6 py-3.5 rounded-xl text-base font-semibold bg-white hover:bg-slate-100 text-[#123B5D] transition-colors"
+            >
+              Discover Experts
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Footer Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           {/* Brand info */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-[#123B5D] flex items-center justify-center text-white">
                 <Award className="w-6 h-6" />
               </div>
-              <span className="text-2xl font-black text-white">
-                Elder<span className="text-sky-400">Expert</span>
+              <span className="text-2xl font-bold text-[#123B5D]">
+                Elder<span className="text-[#2563EB]">Expert</span>
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Preserving valuable professional knowledge, encouraging intergenerational mentorship, and bridging the gap between retired leaders and high-growth organizations.
+            <p className="text-sm text-[#475569] leading-relaxed">
+              Empowering retired senior professionals to share their life's work, preserve valuable industry knowledge, and mentor the next generation.
             </p>
+            <div className="pt-1 flex items-center gap-2 text-xs font-bold text-[#0F766E]">
+              <ShieldCheck className="w-4 h-4" />
+              <span>Verified Executive Directory</span>
+            </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-sm font-extrabold text-white uppercase tracking-wider">Expert Marketplace</h4>
-            <ul className="space-y-2 text-sm font-semibold text-slate-300">
-              <li><a href="#experts" className="hover:text-sky-400 transition-colors">Discover Senior Experts</a></li>
-              <li><a href="#aimatch" className="hover:text-sky-400 transition-colors">AI Recommendation Engine</a></li>
-              <li><a href="#advisory" className="hover:text-sky-400 transition-colors">Advisory Board Seats</a></li>
-              <li><a href="#knowledge" className="hover:text-sky-400 transition-colors">Knowledge Hub Playbooks</a></li>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#123B5D]">Platform</h4>
+            <ul className="space-y-2 text-sm text-[#475569]">
+              <li><a href="#public-experts" className="hover:text-[#2563EB]">Find Senior Experts</a></li>
+              <li><a href="#public-how" className="hover:text-[#2563EB]">How the Platform Works</a></li>
+              <li><a href="#public-mentorship" className="hover:text-[#2563EB]">Mentorship Programs</a></li>
+              <li><a href="#public-knowledge" className="hover:text-[#2563EB]">Knowledge Hub Playbooks</a></li>
             </ul>
           </div>
 
-          {/* Contact & Support */}
+          {/* Support for Seniors & Companies */}
           <div className="space-y-3">
-            <h4 className="text-sm font-extrabold text-white uppercase tracking-wider">Enterprise Concierge</h4>
-            <div className="p-4 rounded-2xl bg-slate-800 border border-slate-700 space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-sky-400 font-extrabold text-sm">
-                <BrainCircuit className="w-4 h-4" />
-                <span>AI Advisory Support:</span>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#123B5D]">Advisor Concierge</h4>
+            <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-2 text-xs text-[#334155] shadow-xs">
+              <span className="font-bold text-[#123B5D] block text-sm">Dedicated Senior Support</span>
+              <p className="text-slate-500">Need help scheduling or creating an account? Our concierge team is ready to talk.</p>
+              <div className="font-bold text-[#2563EB] text-sm pt-1">
+                📞 1-800-ELDER-HELP
               </div>
-              <div className="text-base font-extrabold text-white">concierge@elderexpert.ai</div>
-              <p className="text-xs text-slate-400 font-medium">Dedicated support for senior experts & hiring managers</p>
+              <div className="text-slate-600 font-medium">
+                ✉️ support@elderexpert.com
+              </div>
             </div>
           </div>
 
-          {/* Verification Badges */}
+          {/* Security & Accessibility */}
           <div className="space-y-3">
-            <h4 className="text-sm font-extrabold text-white uppercase tracking-wider">Platform Security</h4>
-            <div className="space-y-2 text-xs font-bold text-slate-300">
-              <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <span>7-Step Executive Verification</span>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-sky-400 flex-shrink-0" />
-                <span>Confidential NDA & IP Protection</span>
-              </div>
-            </div>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#123B5D]">Accessibility & Trust</h4>
+            <ul className="space-y-2 text-xs text-[#475569]">
+              <li>✓ High-contrast senior accessibility design</li>
+              <li>✓ Strict enterprise NDA coverage</li>
+              <li>✓ Independent career credential verification</li>
+              <li>✓ Flexible payments & secure direct deposit</li>
+            </ul>
           </div>
 
         </div>
 
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-medium">
-          <p>© {new Date().getFullYear()} ElderExpert Network. Bridging Generations through Knowledge.</p>
-          <div className="flex items-center gap-4 mt-4 sm:mt-0 font-bold">
-            <a href="#privacy" className="hover:text-white">Privacy Policy</a>
-            <a href="#terms" className="hover:text-white">Terms of Service</a>
-            <a href="#ethics" className="hover:text-white">Code of Ethics</a>
+        {/* Bottom copyright */}
+        <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-[#475569] gap-4">
+          <p>© {new Date().getFullYear()} ElderExpert Inc. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <a href="#privacy" className="hover:underline">Privacy Policy</a>
+            <a href="#terms" className="hover:underline">Terms of Service</a>
+            <a href="#accessibility" className="hover:underline">Accessibility Statement</a>
           </div>
         </div>
 
