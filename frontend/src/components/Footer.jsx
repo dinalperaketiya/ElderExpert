@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Phone, Mail, MapPin, Heart, ExternalLink } from 'lucide-react';
+import { Award, Mail, Phone, ExternalLink, ShieldCheck, Heart, BrainCircuit } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -12,52 +12,52 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-slate-950">
-                <Shield className="w-6 h-6 text-white" />
+                <Award className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-extrabold text-white">
                 Elder<span className="gradient-text">Expert</span>
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Empowering seniors and reassuring families through certified caregiver matching, real-time health telemetry, and 24/7 medical response.
+              Preserving valuable professional knowledge, encouraging intergenerational mentorship, and bridging the gap between retired leaders and high-growth organizations.
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Services</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Expert Marketplace</h4>
             <ul className="space-y-2 text-xs">
-              <li><a href="#nursing" className="hover:text-emerald-400 transition-colors">Registered Nursing</a></li>
-              <li><a href="#memory" className="hover:text-emerald-400 transition-colors">Dementia Memory Care</a></li>
-              <li><a href="#companion" className="hover:text-emerald-400 transition-colors">Companion Visits</a></li>
-              <li><a href="#transport" className="hover:text-emerald-400 transition-colors">Medical Transport</a></li>
+              <li><a href="#experts" className="hover:text-sky-400 transition-colors">Discover Experts</a></li>
+              <li><a href="#aimatch" className="hover:text-sky-400 transition-colors">AI Match Engine</a></li>
+              <li><a href="#advisory" className="hover:text-sky-400 transition-colors">Advisory Board Seats</a></li>
+              <li><a href="#knowledge" className="hover:text-sky-400 transition-colors">Knowledge Hub & Playbooks</a></li>
             </ul>
           </div>
 
-          {/* Emergency Hotline */}
+          {/* Contact & Support */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">24/7 Hotline</h4>
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-              <div className="flex items-center gap-2 text-red-400 text-xs font-bold">
-                <Phone className="w-4 h-4 animate-pulse" />
-                <span>Emergency Dispatch:</span>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Enterprise Concierge</h4>
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-sky-400 font-bold">
+                <BrainCircuit className="w-4 h-4" />
+                <span>AI Matching Support:</span>
               </div>
-              <div className="text-lg font-black text-white">1-800-ELDER-HELP</div>
-              <p className="text-[11px] text-slate-500">Available 365 days a year</p>
+              <div className="text-sm font-bold text-white">concierge@elderexpert.ai</div>
+              <p className="text-[11px] text-slate-500">Dedicated assistance for corporate advisory requests</p>
             </div>
           </div>
 
           {/* Verification Badges */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Certifications</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Platform Security</h4>
             <div className="space-y-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>HIPAA Compliant Health Telemetry</span>
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>7-Step Executive Background Verification</span>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-sky-400"></span>
-                <span>State Licensed Care Coordinators</span>
+                <ShieldCheck className="w-4 h-4 text-sky-400" />
+                <span>Secure NDA & IP Protection Standard</span>
               </div>
             </div>
           </div>
@@ -65,11 +65,11 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} ElderExpert Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} ElderExpert Network. Bridging Generations through Knowledge.</p>
           <div className="flex items-center gap-4 mt-4 sm:mt-0">
             <a href="#privacy" className="hover:text-slate-400">Privacy Policy</a>
             <a href="#terms" className="hover:text-slate-400">Terms of Service</a>
-            <a href="#contact" className="hover:text-slate-400">Contact Support</a>
+            <a href="#code" className="hover:text-slate-400">Code of Ethics</a>
           </div>
         </div>
 
