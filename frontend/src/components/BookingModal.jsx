@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, User, CheckCircle2, X, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle2, X, Sparkles, Building, Briefcase } from 'lucide-react';
 
-export default function BookingModal({ isOpen, onClose, selectedCaregiver, selectedService }) {
+export default function BookingModal({ isOpen, onClose, selectedExpert, selectedService }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState('09:00');
-  const [duration, setDuration] = useState('4 Hours');
-  const [notes, setNotes] = useState('');
+  const [time, setTime] = useState('10:00');
+  const [sessionType, setSessionType] = useState('60-Min 1-on-1 Mentorship');
+  const [projectBrief, setProjectBrief] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -20,10 +20,14 @@ export default function BookingModal({ isOpen, onClose, selectedCaregiver, selec
     onClose();
   };
 
-  const title = selectedCaregiver ? `Book Caregiver: ${selectedCaregiver.name}` : selectedService ? `Request Service: ${selectedService.title}` : 'Book Care Visit';
+  const title = selectedExpert
+    ? `Book Advisory Session: ${selectedExpert.name}`
+    : selectedService
+    ? `Book Service: ${selectedService.title}`
+    : 'Schedule Senior Expert Consultation';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
       <div className="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-700/80 shadow-2xl relative space-y-6">
         
         {/* Close Button */}
@@ -41,9 +45,9 @@ export default function BookingModal({ isOpen, onClose, selectedCaregiver, selec
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-2xl font-extrabold text-white">Booking Confirmed!</h3>
+              <h3 className="text-2xl font-extrabold text-white">Consultation Request Submitted!</h3>
               <p className="text-sm text-slate-300">
-                Your care request has been registered. A caregiver coordinator will call to confirm access details.
+                Your request has been routed to the expert via AI matching assistant. Calendar invite and preparation agenda will be sent to your email.
               </p>
             </div>
 
@@ -53,8 +57,8 @@ export default function BookingModal({ isOpen, onClose, selectedCaregiver, selec
                 <span className="font-bold text-white">{date} at {time}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Duration:</span>
-                <span className="font-bold text-white">{duration}</span>
+                <span className="text-slate-400">Engagement Type:</span>
+                <span className="font-bold text-sky-400">{sessionType}</span>
               </div>
             </div>
 
@@ -69,71 +73,76 @@ export default function BookingModal({ isOpen, onClose, selectedCaregiver, selec
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <h3 className="text-xl font-extrabold text-white">{title}</h3>
-              <p className="text-xs text-slate-400 mt-1">Select date, duration, and patient care instructions.</p>
+              {selectedExpert && (
+                <p className="text-xs text-emerald-400 font-bold mt-1">
+                  {selectedExpert.title} — {selectedExpert.formerCompany} (${selectedExpert.hourlyRate}/hr)
+                </p>
+              )}
             </div>
 
             {/* Date & Time Row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-400" /> Date
+                  <Calendar className="w-3.5 h-3.5 text-sky-400" /> Preferred Date
                 </label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500"
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-emerald-400" /> Start Time
+                  <Clock className="w-3.5 h-3.5 text-sky-400" /> Start Time
                 </label>
                 <input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500"
                   required
                 />
               </div>
             </div>
 
-            {/* Duration selection */}
+            {/* Engagement Type selection */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Shift Duration</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Engagement Format</label>
               <select
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500"
+                value={sessionType}
+                onChange={(e) => setSessionType(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500"
               >
-                <option value="2 Hours">2 Hours (Quick Visit / Check-in)</option>
-                <option value="4 Hours">4 Hours (Half Day Care)</option>
-                <option value="8 Hours">8 Hours (Full Day Shift)</option>
-                <option value="24 Hours">24 Hours (Overnight Nursing)</option>
+                <option value="60-Min 1-on-1 Mentorship">60-Min 1-on-1 Mentorship Call</option>
+                <option value="Technical Architecture Audit">Technical Architecture / Code Audit</option>
+                <option value="Strategy & M&A Pitch Review">Strategy & Investor Pitch Review</option>
+                <option value="Fractional Advisory Board Retainer">Fractional Board Seat Retainer</option>
               </select>
             </div>
 
-            {/* Care instructions */}
+            {/* Brief notes */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Special Care Notes / Requirements</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Project Brief / Questions for Expert</label>
               <textarea
                 rows={3}
-                placeholder="E.g., Patient uses a walker, requires diabetic meal prep, prefers morning outdoor walk..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500 resize-none"
+                placeholder="Detail your company goal, technical specs, or specific advice needed from this veteran expert..."
+                value={projectBrief}
+                onChange={(e) => setProjectBrief(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 resize-none"
+                required
               />
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all shadow-lg shadow-emerald-500/20"
+              className="w-full py-3.5 rounded-xl font-extrabold bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 transition-all shadow-lg shadow-sky-500/20"
             >
-              Confirm Care Booking
+              Send Advisory Consultation Request
             </button>
           </form>
         )}
