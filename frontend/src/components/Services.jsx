@@ -1,39 +1,43 @@
 import React from 'react';
-import { HeartHandshake, Shield, UserCheck, PhoneCall, Truck, Activity, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { PhoneCall, FileCode, Award, Users, CheckCircle2, ArrowRight, ShieldCheck, Briefcase } from 'lucide-react';
 
 export default function Services({ onBookService }) {
   const serviceItems = [
     {
       id: 1,
-      title: '24/7 Registered Nursing Care',
-      desc: 'In-home skilled medical care including IV therapy, wound dressing, vitals monitoring, and physician updates.',
-      icon: Shield,
-      features: ['Licensed Registered Nurses', 'Daily Physician Sync', 'Medical Equipment Setup'],
-      price: 'From $45/hr'
+      title: '1-on-1 Strategic Mentorship Call',
+      duration: '60 Minute Live Video Session',
+      desc: 'Direct consultation with a veteran executive to refine company strategy, resolve operational bottlenecks, and get candid career mentorship.',
+      icon: PhoneCall,
+      features: ['Direct 1-on-1 Video Session', 'Pre-Call Agenda Review', 'Post-Call Action Summary'],
+      price: '$150 - $250 / hr'
     },
     {
       id: 2,
-      title: 'Memory Care & Dementia Support',
-      desc: 'Specialized cognitive exercises, safety monitoring, and familiar routine management tailored for Alzheimer patients.',
-      icon: UserCheck,
-      features: ['Certified Memory Caregivers', 'Wandering Protection', 'Cognitive Stimulation'],
-      price: 'From $35/hr'
+      title: 'Technical & Architecture Review',
+      duration: 'Short-Term Audit Project',
+      desc: 'Deep-dive review of system architecture, VLSI specs, biotech clinical protocols, or financial models with formal written feedback.',
+      icon: FileCode,
+      features: ['In-Depth Spec Audit', 'Security & Scalability Check', 'Written Recommendation Report'],
+      price: '$500 - $1,500 / project'
     },
     {
       id: 3,
-      title: 'Companion Care & Daily Living',
-      desc: 'Friendly companionship, meal preparation, light housekeeping, medication reminders, and social activities.',
-      icon: HeartHandshake,
-      features: ['Personal Assistance', 'Nutritional Meal Prep', 'Social & Outdoor Walks'],
-      price: 'From $28/hr'
+      title: 'Fractional Board Advisory Seat',
+      duration: 'Ongoing Monthly Retainer',
+      desc: 'Quarterly board participation, monthly strategic check-ins, high-level investor intros, and governance advice from retired leaders.',
+      icon: Award,
+      features: ['Quarterly Board Attendance', 'Monthly Strategy Syncs', 'Warm Executive Intros'],
+      price: '$1,200 / month'
     },
     {
       id: 4,
-      title: 'Medical Transport & Errands',
-      desc: 'Wheelchair-accessible transport to doctor appointments, pharmacy pickups, grocery shopping, and therapy visits.',
-      icon: Truck,
-      features: ['Wheelchair Ramp Vehicles', 'Caregiver Accompaniment', 'Door-to-Door Escort'],
-      price: 'From $30/trip'
+      title: 'Team Workshop & Masterclass',
+      duration: 'Half-Day Session',
+      desc: 'Customized hands-on workshop for junior engineers, founders, or product teams led by a retired industry authority.',
+      icon: Users,
+      features: ['Interactive Team Training', 'Custom Curriculum Prep', 'Live Q&A & Case Studies'],
+      price: '$800 - $2,000 / session'
     }
   ];
 
@@ -44,14 +48,14 @@ export default function Services({ onBookService }) {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase">
-            <HeartHandshake className="w-3.5 h-3.5" />
-            <span>Comprehensive Elder Services</span>
+            <Briefcase className="w-3.5 h-3.5" />
+            <span>Advisory Engagement Models</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Tailored Home Care Solutions for Every Need
+            How Organizations Hire Elder Experts
           </h2>
           <p className="text-slate-400 text-sm">
-            Whether your loved one needs full-time medical nursing or gentle daily companionship, ElderExpert delivers personalized, dignified home care.
+            Flexible, high-impact engagement models tailored for startups, corporations, and young professionals.
           </p>
         </div>
 
@@ -69,12 +73,13 @@ export default function Services({ onBookService }) {
                     <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
                       <Icon className="w-7 h-7" />
                     </div>
-                    <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-800 text-sky-400 border border-slate-700">
+                    <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-800 text-emerald-400 border border-slate-700">
                       {service.price}
                     </span>
                   </div>
 
                   <h3 className="text-xl font-bold text-white">{service.title}</h3>
+                  <p className="text-xs font-semibold text-sky-400">{service.duration}</p>
                   <p className="text-sm text-slate-300 leading-relaxed">{service.desc}</p>
 
                   <div className="space-y-2 pt-2">
@@ -90,9 +95,9 @@ export default function Services({ onBookService }) {
                 <div className="pt-6 border-t border-slate-800">
                   <button
                     onClick={() => onBookService(service)}
-                    className="w-full py-3 rounded-xl font-bold bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white border border-slate-700 hover:border-emerald-500 transition-all duration-200 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl font-bold bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white border border-slate-700 hover:border-emerald-500 transition-all duration-200 flex items-center justify-center gap-2 text-xs"
                   >
-                    <span>Request Care Plan</span>
+                    <span>Request Engagement</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
