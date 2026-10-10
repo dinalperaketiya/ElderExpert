@@ -1,144 +1,164 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Caregivers from './components/Caregivers'; // Experts Directory
-import AiMatchEngine from './components/AiMatchEngine';
-import Services from './components/Services';
-import KnowledgeHub from './components/KnowledgeHub';
-import BookingModal from './components/BookingModal';
-import JoinExpertModal from './components/JoinExpertModal';
+import TrustValueSection from './components/TrustValueSection';
+import HowItWorks from './components/HowItWorks';
+import FeaturedExperts from './components/FeaturedExperts';
+import ExpertCategories from './components/ExpertCategories';
+import MentorshipSection from './components/MentorshipSection';
+import ExpertPortal from './components/ExpertPortal';
+import CompanyPortal from './components/CompanyPortal';
+import ExpertProfileModal from './components/ExpertProfileModal';
 import LoginModal from './components/LoginModal';
+import JoinExpertModal from './components/JoinExpertModal';
 import Footer from './components/Footer';
 
 import { initialExperts } from './services/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('experts');
+  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'expert-portal', 'company-portal'
+  const [fontSize, setFontSize] = useState('large'); // 'normal', 'large', 'xlarge'
   const [experts] = useState(initialExperts);
-  const [searchFilter, setSearchFilter] = useState('');
-  const [fontSize, setFontSize] = useState('large'); // 'normal', 'large', 'xlarge' (Default large for elderly accessibility)
 
   // Modals state
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isJoinOpen, setIsJoinOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [loginRole, setLoginRole] = useState('expert');
-
   const [selectedExpert, setSelectedExpert] = useState(null);
-  const [selectedService, setSelectedService] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginRole, setLoginRole] = useState('expert');
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  const handleOpenBookingForExpert = (expert) => {
-    setSelectedExpert(expert);
-    setSelectedService(null);
-    setIsBookingOpen(true);
-  };
-
-  const handleOpenBookingForService = (service) => {
-    setSelectedService(service);
-    setSelectedExpert(null);
-    setIsBookingOpen(true);
-  };
-
-  const handleHeroSearch = (query) => {
-    setSearchFilter(query);
-    setActiveTab('experts');
-  };
-
-  const handleOpenLoginModal = (role) => {
+  const handleOpenLogin = (role) => {
     setLoginRole(role);
-    setIsLoginOpen(true);
+    setIsLoginModalOpen(true);
+  };
+
+  const handleSelectExpert = (expert) => {
+    setSelectedExpert(expert);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleSelectCategory = (categoryName) => {
+    // Scroll to experts section and set search filter
+    const expertsSec = document.getElementById('public-experts');
+    if (expertsSec) {
+      expertsSec.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const fontSizeClass = fontSize === 'xlarge' ? 'font-size-xlarge' : fontSize === 'large' ? 'font-size-large' : 'font-size-normal';
 
+  // If in dedicated Expert Portal view
+  if (currentView === 'expert-portal') {
+    return (
+      <div className={`min-h-screen bg-slate-50 text-[#334155] font-sans ${fontSizeClass}`}>
+        <ExpertPortal onReturnHome={() => setCurrentView('landing')} />
+      </div>
+    );
+  }
+
+  // If in dedicated Company Portal view
+  if (currentView === 'company-portal') {
+    return (
+      <div className={`min-h-screen bg-slate-50 text-[#334155] font-sans ${fontSizeClass}`}>
+        <CompanyPortal
+          onReturnHome={() => setCurrentView('landing')}
+          onSelectExpert={handleSelectExpert}
+        />
+        <ExpertProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          expert={selectedExpert}
+        />
+      </div>
+    );
+  }
+
+  // Default Landing Page View
   return (
-    <div className={`min-h-screen bg-slate-100 text-slate-900 flex flex-col justify-between selection:bg-sky-600 selection:text-white font-sans ${fontSizeClass}`}>
+    <div className={`min-h-screen bg-white text-[#334155] flex flex-col justify-between selection:bg-blue-600 selection:text-white font-sans ${fontSizeClass}`}>
       
-      {/* Accessible Navbar with Text Size controls & Separate Login buttons */}
+      {/* Narrow Taskbar Navigation */}
       <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
         fontSize={fontSize}
         setFontSize={setFontSize}
-        onOpenLoginModal={handleOpenLoginModal}
+        onOpenLogin={handleOpenLogin}
+        onOpenJoinExpert={() => setIsJoinModalOpen(true)}
       />
 
-      {/* Main View dependent on activeTab */}
+      {/* Main Landing Page Body */}
       <main className="flex-1">
-        {activeTab === 'experts' && (
-          <>
-            <Hero
-              onSearchQuery={handleHeroSearch}
-              onOpenLoginModal={handleOpenLoginModal}
-            />
-            <Caregivers
-              experts={experts}
-              onSelectExpert={handleOpenBookingForExpert}
-              searchFilter={searchFilter}
-            />
-            <AiMatchEngine
-              onSelectExpert={handleOpenBookingForExpert}
-            />
-            <Services
-              onBookService={handleOpenBookingForService}
-            />
-            <KnowledgeHub
-              onBookSession={() => setIsBookingOpen(true)}
-            />
-          </>
-        )}
+        
+        {/* 1. Hero Section with provided office background */}
+        <Hero
+          onJoinExpert={() => setIsJoinModalOpen(true)}
+          onFindExperts={() => {
+            const el = document.getElementById('public-experts');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
 
-        {activeTab === 'aimatch' && (
-          <div className="py-8">
-            <AiMatchEngine
-              onSelectExpert={handleOpenBookingForExpert}
-            />
-          </div>
-        )}
+        {/* 2. Trust and Value Section (3 Clear Benefits) */}
+        <TrustValueSection
+          onJoinExpert={() => setIsJoinModalOpen(true)}
+          onFindExperts={() => {
+            const el = document.getElementById('public-experts');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
 
-        {activeTab === 'services' && (
-          <div className="py-8">
-            <Services
-              onBookService={handleOpenBookingForService}
-            />
-          </div>
-        )}
+        {/* 3. How It Works (4-Step Process) */}
+        <HowItWorks />
 
-        {activeTab === 'knowledge' && (
-          <div className="py-8">
-            <KnowledgeHub
-              onBookSession={() => setIsBookingOpen(true)}
-            />
-          </div>
-        )}
+        {/* 4. Featured Experts Directory */}
+        <FeaturedExperts
+          experts={experts}
+          onSelectExpert={handleSelectExpert}
+          onRequestConsultation={handleSelectExpert}
+        />
+
+        {/* 5. Expert Categories */}
+        <ExpertCategories
+          onSelectCategory={handleSelectCategory}
+        />
+
+        {/* 6. Mentorship & Knowledge Sharing */}
+        <MentorshipSection
+          onOpenArticle={(art) => alert(`Reading "${art.title}" by ${art.author}`)}
+          onExploreMentorship={() => {
+            const el = document.getElementById('public-experts');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
+
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* 7. Final Call to Action & Clean Light Footer */}
+      <Footer
+        onJoinExpert={() => setIsJoinModalOpen(true)}
+        onFindExperts={() => {
+          const el = document.getElementById('public-experts');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
 
-      {/* Separate Login / Register Modal */}
+      {/* Interactive Modals */}
       <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
         initialRole={loginRole}
       />
 
-      {/* Consultation Booking Modal */}
-      <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => {
-          setIsBookingOpen(false);
-          setSelectedExpert(null);
-          setSelectedService(null);
-        }}
-        selectedExpert={selectedExpert}
-        selectedService={selectedService}
+      <JoinExpertModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
       />
 
-      {/* Expert Onboarding Modal */}
-      <JoinExpertModal
-        isOpen={isJoinOpen}
-        onClose={() => setIsJoinOpen(false)}
+      <ExpertProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        expert={selectedExpert}
       />
 
     </div>
