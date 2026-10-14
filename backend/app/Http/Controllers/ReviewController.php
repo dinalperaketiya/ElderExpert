@@ -35,8 +35,23 @@ class ReviewController extends Controller
         ]);
 
         $booking = Booking::findOrFail($validated['booking_id']);
+        $user = $request->user();
 
-        // Prevent multiple reviews for the same booking
+        // Only the person who made the booking can review it
+        if ($booking->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'You can only review your own bookings.'
+            ], 403);
+        }
+
+        // Only completed bookings can be reviewed
+        if ($booking->status !== 'completed') {
+            return response()->json([
+                'message' => 'You can only review completed bookings.'
+            ], 422);
+        }
+
+        // Prevent duplicate reviews
         if (Review::where('booking_id', $booking->id)->exists()) {
             return response()->json([
                 'message' => 'A review already exists for this booking.'
@@ -45,7 +60,7 @@ class ReviewController extends Controller
 
         $review = Review::create([
             'booking_id' => $booking->id,
-            'user_id' => $booking->user_id,
+            'user_id' => $user->id,
             'expert_id' => $booking->expert_id,
             'rating' => $validated['rating'],
             'comment' => $validated['comment'] ?? null,
@@ -61,6 +76,14 @@ class ReviewController extends Controller
     public function update(Request $request, $id)
     {
         $review = Review::findOrFail($id);
+        $user = $request->user();
+
+        // Only the review owner or admin can update
+        if ($review->user_id !== $user->id && $user->role !== 'admin') {
+            return response()->json([
+                'message' => 'You are not authorized to update this review.'
+            ], 403);
+        }
 
         $validated = $request->validate([
             'rating' => 'sometimes|required|integer|min:1|max:5',
@@ -76,9 +99,18 @@ class ReviewController extends Controller
     }
 
     // Delete a review
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $review = Review::findOrFail($id);
+        $user = $request->user();
+
+        // Only the review owner or admin can delete
+        if ($review->user_id !== $user->id && $user->role !== 'admin') {
+            return response()->json([
+                'message' => 'You are not authorized to delete this review.'
+            ], 403);
+        }
+
         $review->delete();
 
         return response()->json([
