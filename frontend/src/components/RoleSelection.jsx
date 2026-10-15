@@ -1,131 +1,147 @@
-
 import React from 'react';
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChartNoAxesCombined,
+  ClipboardList,
+  GraduationCap,
+  Leaf,
+  Search,
+  ShieldCheck,
+  UserRound,
+  UsersRound,
+} from 'lucide-react';
+import rolePortalsImage from '../assets/role-portals.png';
 import './RoleSelection.css';
 
 const portals = [
-    {
-        id: 'company',
-        number: '01',
-        title: 'Company',
-        description: 'Find experienced minds to move your business forward.',
-        icon: '↗',
-    },
-    {
-        id: 'young-professional',
-        number: '02',
-        title: 'Young Professional',
-        description: 'Build your future with guidance from industry experts.',
-        icon: '↗',
-    },
-    {
-        id: 'expert',
-        number: '03',
-        title: 'Elder Expert',
-        description: 'Share your experience. Inspire the next generation.',
-        icon: '↗',
-    },
+  {
+    id: 'company',
+    title: 'Company',
+    description: 'Find experienced professionals, get expert advice, and collaborate on your projects.',
+    icon: BriefcaseBusiness,
+    features: [
+      [ShieldCheck, 'Access verified experts'],
+      [ClipboardList, 'Post projects and opportunities'],
+      [CalendarDays, 'Manage bookings and consultations'],
+    ],
+  },
+  {
+    id: 'expert',
+    title: 'Elder Expert',
+    description: 'Share your knowledge, provide consultations, and make an impact with your experience.',
+    icon: GraduationCap,
+    features: [
+      [UserRound, 'Create expert profile'],
+      [CalendarDays, 'Manage your availability'],
+      [UsersRound, 'Connect with companies and talent'],
+    ],
+  },
+  {
+    id: 'young-professional',
+    title: 'Young Professional',
+    description: 'Learn from experienced experts, get career guidance, and build your network.',
+    icon: UsersRound,
+    features: [
+      [Search, 'Find mentors and experts'],
+      [CalendarDays, 'Book consultations'],
+      [ChartNoAxesCombined, 'Grow your skills and career'],
+    ],
+  },
 ];
 
-export default function RoleSelection({ onSelectRole }) {
-    return (
-        <main className="role-page">
-            {/* Left: Brand and future background photo */}
-            <section className="role-visual">
-                <div className="visual-glow visual-glow-one" />
-                <div className="visual-glow visual-glow-two" />
+function BrandMark() {
+  return (
+    <span className="brand-mark" aria-hidden="true">
+      <span className="brand-mark__leaf brand-mark__leaf--one" />
+      <span className="brand-mark__leaf brand-mark__leaf--two" />
+      <span className="brand-mark__leaf brand-mark__leaf--three" />
+      <span className="brand-mark__leaf brand-mark__leaf--four" />
+    </span>
+  );
+}
 
-                <header className="brand">
-                    <div className="brand-mark">E</div>
-                    <span>elder<span className="brand-light">expert</span></span>
-                </header>
-
-                <div className="visual-content">
-          <span className="eyebrow">
-            <span className="status-dot" />
-            EXPERIENCE HAS NO AGE
+export default function RoleSelection({ onSelectRole, onCreateAccount }) {
+  return (
+    <main className="role-page">
+      <header className="role-header">
+        <a className="role-brand" href="#home" aria-label="ElderExpert home">
+          <BrandMark />
+          <span className="role-brand__text">
+            <span className="role-brand__name">ElderExpert</span>
+            <span className="role-brand__tagline">CONNECT&nbsp; • &nbsp;COLLABORATE&nbsp; • &nbsp;GROW</span>
           </span>
+        </a>
 
-                    <h1>
-                        Wisdom
-                        <br />
-                        meets
-                        <br />
-                        <span>possibility.</span>
-                    </h1>
+        <div className="role-signin">
+          <span>New to ElderExpert?</span>
+          <button type="button" className="role-signin__button" onClick={onCreateAccount}>
+            Create Account <ArrowRight size={18} aria-hidden="true" />
+          </button>
+        </div>
+      </header>
 
-                    <p className="visual-description">
-                        A place where experience creates opportunity,
-                        knowledge builds confidence, and generations
-                        grow together.
-                    </p>
+      <section className="role-intro" aria-labelledby="role-title">
+        <p className="role-kicker">WELCOME TO ELDEREXPERT</p>
+        <h1 id="role-title">Choose Your Role</h1>
+        <p className="role-intro__copy">
+          Join a community where experience meets opportunity.<br className="desktop-break" />
+          Select your role to continue to your personalized portal.
+        </p>
+        <div className="role-divider" aria-hidden="true">
+          <span /> <Leaf size={18} fill="currentColor" /> <span />
+        </div>
+      </section>
 
-                    <div className="visual-bottom">
-                        <div className="avatar-stack" aria-hidden="true">
-                            <span>✦</span>
-                            <span>+</span>
-                            <span>∞</span>
-                        </div>
-                        <div>
-                            <strong>One community.</strong>
-                            <p>Three ways to grow together.</p>
-                        </div>
-                    </div>
-                </div>
+      <section className="portal-grid" aria-label="Choose your ElderExpert portal">
+        {portals.map((portal) => {
+          const RoleIcon = portal.icon;
+          return (
+            <article className="portal-card" key={portal.id}>
+              <div
+                className={`portal-card__art portal-card__art--${portal.id}`}
+                role="img"
+                aria-label={`${portal.title} portal illustration`}
+              >
+                <img src={rolePortalsImage} alt="" aria-hidden="true" />
+              </div>
 
-                <span className="visual-index">EE — 001 / CONNECT</span>
-            </section>
-
-            {/* Right: Role selection */}
-            <section className="role-panel">
-                <div className="panel-top">
-                    <span className="panel-label">WELCOME TO ELDEREXPERT</span>
-                    <span className="online-indicator">
-            <span className="status-dot" />
-            YOUR NEXT CHAPTER STARTS HERE
-          </span>
-                </div>
-
-                <div className="panel-heading">
-                    <span className="section-number">01 / GET STARTED</span>
-                    <h2>
-                        How will you
-                        <br />
-                        <span>grow with us?</span>
-                    </h2>
-                    <p>
-                        Choose your space. We’ll help you take it from there.
-                    </p>
-                </div>
-
-                <div className="portal-list">
-                    {portals.map((portal) => (
-                        <button
-                            className="portal-card"
-                            key={portal.id}
-                            onClick={() => onSelectRole(portal.id)}
-                            type="button"
-                        >
-                            <span className="portal-number">{portal.number}</span>
-
-                            <span className="portal-copy">
-                <span className="portal-title">{portal.title}</span>
-                <span className="portal-description">
-                  {portal.description}
+              <div className="portal-card__body">
+                <span className="portal-card__icon" aria-hidden="true">
+                  <RoleIcon size={25} strokeWidth={2.5} />
                 </span>
-              </span>
+                <h2>{portal.title}</h2>
+                <p className="portal-card__description">{portal.description}</p>
 
-                            <span className="portal-arrow" aria-hidden="true">
-                {portal.icon}
-              </span>
-                        </button>
-                    ))}
-                </div>
+                <ul className="portal-card__features">
+                  {portal.features.map(([FeatureIcon, label]) => (
+                    <li key={label}>
+                      <FeatureIcon size={20} strokeWidth={2.2} aria-hidden="true" />
+                      <span>{label}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                <footer className="panel-footer">
-                    <span>KNOWLEDGE CONNECTS US ALL.</span>
-                    <span>© ELDEREXPERT</span>
-                </footer>
-            </section>
-        </main>
-    );
+                <button
+                  className="portal-card__button"
+                  onClick={() => onSelectRole(portal.id)}
+                  type="button"
+                >
+                  Continue as {portal.title}
+                  <ArrowRight size={19} aria-hidden="true" />
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      <footer className="role-footer">
+        <span />
+        <p>Different Generations <b>•</b> Shared Knowledge <b>•</b> A Brighter Tomorrow</p>
+        <span />
+      </footer>
+    </main>
+  );
 }

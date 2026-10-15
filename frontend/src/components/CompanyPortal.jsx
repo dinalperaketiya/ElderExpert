@@ -4,7 +4,7 @@ import {
   Bookmark, Star, Building2, Settings, ArrowLeft, Sparkles,
   Bell, Filter, SortAsc, MapPin, Clock,
   CheckCircle2, AlertCircle, Users, TrendingUp, Activity,
-  X, Send, Eye, Menu, Plus
+  X, Send, Eye, Menu, Plus, LogOut
 } from 'lucide-react';
 import { initialExperts } from '../services/api';
 import './CompanyPortal.css';
@@ -1070,7 +1070,7 @@ const NAV_ITEMS = [
   { id: 'settings',         label: 'Settings',        icon: Settings        },
 ];
 
-export default function CompanyPortal({ onReturnHome, onSelectExpert }) {
+export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }) {
   const [activeNav,    setActiveNav]    = useState('overview');
   const [savedExperts, setSavedExperts] = useState([1, 2]);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
@@ -1140,6 +1140,10 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert }) {
               <span className="cp-header__company-sub">{DEMO_COMPANY.industry}</span>
             </div>
           </div>
+          <button className="cp-header__logout" onClick={onLogout} type="button" title="Sign out">
+            <LogOut size={16} />
+            <span>Sign out</span>
+          </button>
         </div>
       </header>
 

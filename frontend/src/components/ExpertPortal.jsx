@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  User, Briefcase, Calendar, Star, FileText, CheckCircle2, ShieldCheck, ArrowLeft
+  User, Briefcase, Calendar, Star, FileText, CheckCircle2, ShieldCheck, ArrowLeft, LogOut
 } from 'lucide-react';
 import { initialExpertOpportunities, initialConsultationRequests, initialKnowledgeArticles } from '../services/api';
 
-export default function ExpertPortal({ onReturnHome }) {
+export default function ExpertPortal({ onReturnHome, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'opportunities', 'requests', 'articles', 'profile'
   const [consultations, setConsultations] = useState(initialConsultationRequests);
   const [isAvailable, setIsAvailable] = useState(true);
@@ -66,6 +66,14 @@ export default function ExpertPortal({ onReturnHome }) {
               <span className="text-slate-500">VP Architecture (Retired)</span>
             </div>
           </div>
+          <button
+            onClick={onLogout}
+            className="min-h-10 rounded-xl border border-slate-200 px-3 text-xs font-semibold text-slate-600 hover:border-emerald-300 hover:text-emerald-800"
+            type="button"
+          >
+            <LogOut className="mr-1.5 inline h-4 w-4 align-middle" />
+            <span className="hidden sm:inline">Sign out</span>
+          </button>
         </div>
       </div>
 
