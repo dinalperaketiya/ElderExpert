@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base API configuration to interact with Laravel backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,6 +11,29 @@ export const api = axios.create({
   },
   timeout: 5000,
 });
+
+const AUTH_TOKEN_KEY = 'elderexpert_token';
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+export const saveAuthToken = (token) => localStorage.setItem(AUTH_TOKEN_KEY, token);
+export const clearAuthToken = () => localStorage.removeItem(AUTH_TOKEN_KEY);
+
+export const authApi = {
+  register: (payload) => api.post('/register', payload),
+  login: (payload) => api.post('/login', payload),
+  me: () => api.get('/me'),
+  logout: () => api.post('/logout'),
+};
 
 // Verified Retired Experts Directory
 export const initialExperts = [

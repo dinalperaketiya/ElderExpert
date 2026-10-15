@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -13,7 +14,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:expert,company,young_professional',
@@ -36,18 +37,25 @@ class AuthController extends Controller
     }
 
     // Login
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email' => 'required|email',
+            'identifier' => 'required_without:email|string|max:255',
+            'email' => 'required_without:identifier|email|max:255',
             'password' => 'required|string',
         ]);
+        $identifier = $validated['identifier'] ?? $validated['email'];
 
-        $user = User::where('email', $validated['email'])->first();
+        $user = User::where('email', $identifier)->first();
+
+        if (!$user) {
+            $usernameMatches = User::where('name', $identifier)->limit(2)->get();
+            $user = $usernameMatches->count() === 1 ? $usernameMatches->first() : null;
+        }
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The email or password is incorrect.'],
+                'identifier' => ['The username/email or password is incorrect.'],
             ]);
         }
 
