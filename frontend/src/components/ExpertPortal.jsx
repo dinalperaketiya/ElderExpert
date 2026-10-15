@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  User, Briefcase, Calendar, MessageSquare, Star, FileText, CheckCircle2, 
-  Clock, ShieldCheck, ChevronRight, DollarSign, Bell, ArrowLeft, Send
+  User, Briefcase, Calendar, Star, FileText, CheckCircle2, ShieldCheck, ArrowLeft
 } from 'lucide-react';
 import { initialExpertOpportunities, initialConsultationRequests, initialKnowledgeArticles } from '../services/api';
 
