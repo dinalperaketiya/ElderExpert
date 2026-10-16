@@ -30,6 +30,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/expert-profile-photos/{filename}', [ExpertProfileController::class, 'photo'])
     ->where('filename', '[A-Za-z0-9._-]+');
+Route::get('/young-professional-profile-photos/{filename}', [YoungProfessionalProfileController::class, 'photo'])
+    ->where('filename', '[A-Za-z0-9._-]+');
 
 
 // ==========================================
@@ -72,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // YOUNG PROFESSIONALS
     // ======================================
 
+    Route::get('/young-professionals/me', [YoungProfessionalProfileController::class, 'mine'])->middleware('role:young_professional');
     Route::get('/young-professionals', [YoungProfessionalProfileController::class, 'index']);
     Route::get('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'show']);
     Route::post('/young-professionals', [YoungProfessionalProfileController::class, 'store']);

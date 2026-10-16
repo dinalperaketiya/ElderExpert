@@ -6,8 +6,10 @@ import CompanyPortal from './components/CompanyPortal';
 import CompanyProfileSetup from './components/CompanyProfileSetup';
 import ExpertPortal from './components/ExpertPortal';
 import ExpertProfileSetup from './components/ExpertProfileSetup';
+import YoungProfessionalPortal from './components/YoungProfessionalPortal';
+import YoungProfessionalProfileSetup from './components/YoungProfessionalProfileSetup';
 import ExpertProfileModal from './components/ExpertProfileModal';
-import { authApi, clearAuthToken, companyProfileApi, expertProfileApi, getAuthToken } from './services/api';
+import { authApi, clearAuthToken, companyProfileApi, expertProfileApi, getAuthToken, youngProfessionalProfileApi } from './services/api';
 
 const portalForRole = (role) => {
   if (role === 'company') return 'company';
@@ -22,6 +24,7 @@ export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [companyProfile, setCompanyProfile] = useState(null);
   const [expertProfile, setExpertProfile] = useState(null);
+  const [youngProfessionalProfile, setYoungProfessionalProfile] = useState(null);
   const [authError, setAuthError] = useState('');
   const [isCheckingSession, setIsCheckingSession] = useState(() => Boolean(getAuthToken()));
   const [selectedExpert, setSelectedExpert] = useState(null);
@@ -52,6 +55,19 @@ export default function App() {
       } catch {
         setAuthMode('login');
         setAuthError('We couldn’t load your expert profile. Please sign in again.');
+        setCurrentView('auth');
+      }
+      return;
+    }
+
+    if (user.role === 'young_professional') {
+      try {
+        const { data } = await youngProfessionalProfileApi.mine();
+        setYoungProfessionalProfile(data.data);
+        setCurrentView(data.data ? 'young-professional' : 'young-professional-setup');
+      } catch {
+        setAuthMode('login');
+        setAuthError('We couldn’t load your profile. Please sign in again.');
         setCurrentView('auth');
       }
       return;
@@ -115,6 +131,11 @@ export default function App() {
     setCurrentView('expert');
   };
 
+  const handleYoungProfessionalProfileComplete = (profile) => {
+    setYoungProfessionalProfile(profile);
+    setCurrentView('young-professional');
+  };
+
   const handleReturnHome = () => {
     setCurrentView('home');
     setSelectedExpert(null);
@@ -140,6 +161,7 @@ export default function App() {
     setAuthUser(null);
     setCompanyProfile(null);
     setExpertProfile(null);
+    setYoungProfessionalProfile(null);
     setSelectedExpert(null);
     setSelectedRole(null);
     setCurrentView('home');
@@ -190,14 +212,11 @@ export default function App() {
       )}
 
       {currentView === 'young-professional' && (
-        <main className="min-h-screen grid place-items-center bg-[#faf9f4] p-6 text-[#10241f]">
-          <section className="w-full max-w-lg rounded-3xl border border-[#e3e7df] bg-white p-9 text-center shadow-xl">
-            <p className="mb-2 text-xs font-bold tracking-[.2em] text-[#4f7463]">ACCOUNT READY</p>
-            <h1 className="font-serif text-3xl font-bold">Welcome, {authUser?.name}</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600">Your Young Professional account is active. Your personalized portal is coming soon.</p>
-            <button className="mt-7 rounded-full bg-[#0c382f] px-7 py-3 text-sm font-semibold text-white" onClick={handleLogout} type="button">Sign out</button>
-          </section>
-        </main>
+        <YoungProfessionalPortal user={authUser} profile={youngProfessionalProfile} onEditProfile={() => setCurrentView('young-professional-setup')} onLogout={handleLogout} onReturnHome={handleReturnHome} />
+      )}
+
+      {currentView === 'young-professional-setup' && (
+        <YoungProfessionalProfileSetup profile={youngProfessionalProfile} onComplete={handleYoungProfessionalProfileComplete} onLogout={handleLogout} />
       )}
 
       {selectedExpert && (

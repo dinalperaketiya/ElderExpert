@@ -49,6 +49,15 @@ export const expertProfileApi = {
   },
 };
 
+export const youngProfessionalProfileApi = {
+  mine: () => api.get('/young-professionals/me'),
+  create: (profile) => api.post('/young-professionals', profile, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, profile) => {
+    profile.append('_method', 'PUT');
+    return api.post(`/young-professionals/${id}`, profile, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+};
+
 // Verified Retired Experts Directory
 export const initialExperts = [
   {
