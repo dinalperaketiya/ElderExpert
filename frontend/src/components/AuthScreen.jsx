@@ -132,19 +132,21 @@ export default function AuthScreen({ role, onRoleChange, mode, onModeChange, onB
 
           {isRegister ? (
             <label className="auth-field">
-              <span>Email address</span>
+              <span>{role === 'company' ? 'Company email address' : 'Email address'}</span>
               <span className="auth-input-wrap">
                 <Mail size={18} aria-hidden="true" />
-                <input autoComplete="email" name="email" onChange={updateField} placeholder="you@example.com" required type="email" value={form.email} />
+                <input autoComplete="email" name="email" onChange={updateField} placeholder={role === 'company' ? 'name@company.com' : 'you@example.com'} required type="email" value={form.email} />
               </span>
+              {role === 'company' && <small className="auth-field-hint">Use your company email address.</small>}
             </label>
           ) : (
             <label className="auth-field">
-              <span>Username or email</span>
+              <span>{role === 'company' ? 'Company username or email' : 'Username or email'}</span>
               <span className="auth-input-wrap">
                 <UserRound size={18} aria-hidden="true" />
-                <input autoComplete="username" name="identifier" onChange={updateField} placeholder="Enter your username or email" required value={form.identifier} />
+                <input autoComplete="username" name="identifier" onChange={updateField} placeholder={role === 'company' ? 'Enter your company email or username' : 'Enter your username or email'} required value={form.identifier} />
               </span>
+              {role === 'company' && <small className="auth-field-hint">Sign in with the company email used to create your account.</small>}
             </label>
           )}
 

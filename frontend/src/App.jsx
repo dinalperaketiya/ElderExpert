@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import RoleSelection from './components/RoleSelection';
 import AuthScreen from './components/AuthScreen';
 import CompanyPortal from './components/CompanyPortal';
+import CompanyProfileSetup from './components/CompanyProfileSetup';
 import ExpertPortal from './components/ExpertPortal';
+import ExpertProfileSetup from './components/ExpertProfileSetup';
 import ExpertProfileModal from './components/ExpertProfileModal';
-import { authApi, clearAuthToken, getAuthToken } from './services/api';
+import { authApi, clearAuthToken, companyProfileApi, expertProfileApi, getAuthToken } from './services/api';
 
 const portalForRole = (role) => {
   if (role === 'company') return 'company';
@@ -18,19 +20,55 @@ export default function App() {
   const [authMode, setAuthMode] = useState('register');
   const [selectedRole, setSelectedRole] = useState(null);
   const [authUser, setAuthUser] = useState(null);
+  const [companyProfile, setCompanyProfile] = useState(null);
+  const [expertProfile, setExpertProfile] = useState(null);
   const [authError, setAuthError] = useState('');
   const [isCheckingSession, setIsCheckingSession] = useState(() => Boolean(getAuthToken()));
   const [selectedExpert, setSelectedExpert] = useState(null);
+
+  const showUserPortal = async (user) => {
+    setAuthUser(user);
+    setSelectedRole(null);
+    setAuthError('');
+
+    if (user.role === 'company') {
+      try {
+        const { data } = await companyProfileApi.mine();
+        setCompanyProfile(data.data);
+        setCurrentView(data.data ? 'company' : 'company-setup');
+      } catch {
+        setAuthMode('login');
+        setAuthError('We couldn’t load your company profile. Please sign in again.');
+        setCurrentView('auth');
+      }
+      return;
+    }
+
+    if (user.role === 'expert') {
+      try {
+        const { data } = await expertProfileApi.mine();
+        setExpertProfile(data.data);
+        setCurrentView(data.data ? 'expert' : 'expert-setup');
+      } catch {
+        setAuthMode('login');
+        setAuthError('We couldn’t load your expert profile. Please sign in again.');
+        setCurrentView('auth');
+      }
+      return;
+    }
+
+    setCompanyProfile(null);
+    setCurrentView(portalForRole(user.role));
+  };
 
   useEffect(() => {
     if (!getAuthToken()) return undefined;
 
     let isActive = true;
     authApi.me()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (!isActive) return;
-        setAuthUser(data.user);
-        setCurrentView(portalForRole(data.user.role));
+        await showUserPortal(data.user);
       })
       .catch((error) => {
         if (!isActive) return;
@@ -64,10 +102,17 @@ export default function App() {
   };
 
   const handleAuthSuccess = (user) => {
-    setAuthUser(user);
-    setSelectedRole(null);
-    setAuthError('');
-    setCurrentView(portalForRole(user.role));
+    void showUserPortal(user);
+  };
+
+  const handleCompanyProfileComplete = (profile) => {
+    setCompanyProfile(profile);
+    setCurrentView('company');
+  };
+
+  const handleExpertProfileComplete = (profile) => {
+    setExpertProfile(profile);
+    setCurrentView('expert');
   };
 
   const handleReturnHome = () => {
@@ -93,6 +138,8 @@ export default function App() {
     }
     clearAuthToken();
     setAuthUser(null);
+    setCompanyProfile(null);
+    setExpertProfile(null);
     setSelectedExpert(null);
     setSelectedRole(null);
     setCurrentView('home');
@@ -126,11 +173,20 @@ export default function App() {
           onSelectExpert={handleSelectExpert}
           onLogout={handleLogout}
           user={authUser}
+          companyProfile={companyProfile}
         />
       )}
 
+      {currentView === 'company-setup' && (
+        <CompanyProfileSetup user={authUser} onComplete={handleCompanyProfileComplete} onLogout={handleLogout} />
+      )}
+
       {currentView === 'expert' && (
-        <ExpertPortal onReturnHome={handleReturnHome} onLogout={handleLogout} user={authUser} />
+        <ExpertPortal onReturnHome={handleReturnHome} onLogout={handleLogout} onEditProfile={() => setCurrentView('expert-setup')} user={authUser} profile={expertProfile} />
+      )}
+
+      {currentView === 'expert-setup' && (
+        <ExpertProfileSetup profile={expertProfile} onComplete={handleExpertProfileComplete} onLogout={handleLogout} />
       )}
 
       {currentView === 'young-professional' && (

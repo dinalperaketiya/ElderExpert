@@ -7,6 +7,19 @@ use Illuminate\Http\Request;
 
 class CompanyProfileController extends Controller
 {
+    public function mine(Request $request)
+    {
+        if ($request->user()->role !== 'company') {
+            return response()->json([
+                'message' => 'Only company users can view a company profile.'
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => CompanyProfile::where('user_id', $request->user()->id)->first(),
+        ]);
+    }
+
     // Get all company profiles
     public function index()
     {
@@ -45,10 +58,10 @@ class CompanyProfileController extends Controller
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'industry' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'website' => 'nullable|url|max:255',
-            'email' => 'nullable|email|max:255',
+            'industry' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'website' => 'required|url|max:255',
+            'email' => 'required|email|max:255',
             'company_logo' => 'nullable|string|max:255',
         ]);
 

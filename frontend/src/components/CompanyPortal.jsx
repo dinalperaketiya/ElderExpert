@@ -1,194 +1,35 @@
 import React, { useState, useCallback } from 'react';
+import ProjectCreationWizard from './ProjectCreationWizard';
 import {
   LayoutDashboard, Search, Briefcase, Calendar, MessageSquare,
-  Bookmark, Star, Building2, Settings, ArrowLeft, Sparkles,
+  Bookmark, Star, Building2, Settings,
   Bell, Filter, SortAsc, MapPin, Clock,
-  CheckCircle2, AlertCircle, Users, TrendingUp, Activity,
-  X, Send, Eye, Menu, Plus, LogOut
+  Users, TrendingUp, Activity,
+  X, Send, Menu, Plus, LogOut, ArrowRight, BarChart3, FileText, CircleCheck, Monitor, Leaf
 } from 'lucide-react';
-import { initialExperts } from '../services/api';
 import './CompanyPortal.css';
 
 // ─── Demo / mock data clearly marked as illustrative ─────────────────────────
 
 const DEMO_COMPANY = {
-  name: 'AcroTech Dynamics Inc.',
-  initials: 'AT',
-  industry: 'Deep Tech · Series B',
+  name: 'Your Company',
+  initials: 'YC',
+  industry: 'Company account',
   avatar: null,
 };
 
 const DEMO_STATS = [
-  { label: 'Active Projects',     value: '4',  trend: '+1 this month',  color: 'forest',  icon: Briefcase },
-  { label: 'Upcoming Bookings',   value: '3',  trend: 'Next: Tomorrow', color: 'blue',    icon: Calendar  },
-  { label: 'Experts Contacted',   value: '12', trend: '5 responded',    color: 'amber',   icon: Users     },
-  { label: 'Pending Requests',    value: '2',  trend: 'Awaiting reply', color: 'rose',    icon: AlertCircle },
+  { label: 'Experts Contacted', value: '0', trend: 'No activity yet', color: 'forest', icon: Users },
+  { label: 'Active Projects', value: '0', trend: 'Create your first project', color: 'blue', icon: Briefcase },
+  { label: 'Upcoming Bookings', value: '0', trend: 'No bookings yet', color: 'amber', icon: Calendar },
+  { label: 'Average Expert Rating', value: '—', trend: 'Available after your first session', color: 'rose', icon: Star },
 ];
 
-const DEMO_BOOKINGS = [
-  {
-    id: 'bk-1',
-    expertName: 'Dr. Arthur Pendelton',
-    expertTitle: 'VLSI Architecture',
-    expertAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
-    project: 'Edge AI Accelerator Tape-Out',
-    date: 'Tomorrow',
-    time: '10:00 AM EST',
-    duration: '60 min',
-    status: 'confirmed',
-    fee: '$180',
-  },
-  {
-    id: 'bk-2',
-    expertName: 'Margaret Vance, CFA',
-    expertTitle: 'Finance & M&A',
-    expertAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150',
-    project: 'Series B Due Diligence',
-    date: 'Thursday',
-    time: '2:00 PM EST',
-    duration: '60 min',
-    status: 'pending',
-    fee: '$210',
-  },
-  {
-    id: 'bk-3',
-    expertName: 'Dr. Evelyn Sterling, PhD',
-    expertTitle: 'Regulatory Affairs',
-    expertAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=150',
-    project: 'FDA 510(k) Submission',
-    date: 'Next Monday',
-    time: '9:00 AM EST',
-    duration: '90 min',
-    status: 'confirmed',
-    fee: '$337.50',
-  },
-];
-
-const DEMO_PROJECTS = [
-  {
-    id: 'proj-1',
-    title: 'Edge AI Accelerator Tape-Out Audit',
-    description: 'Comprehensive VLSI architecture review and pre-tape-out validation for our edge inference chip targeting autonomous robotics.',
-    status: 'active',
-    domain: 'Technology & Hardware',
-    expertsHired: 2,
-    budget: '$12,000',
-    deadline: 'Nov 15, 2026',
-    proposals: 3,
-  },
-  {
-    id: 'proj-2',
-    title: 'Series B Financial Model & Debt Structuring',
-    description: 'Advisory review of our cap table, debt covenants, and investor term-sheet before our $40M Series B close.',
-    status: 'active',
-    domain: 'Finance & M&A',
-    expertsHired: 1,
-    budget: '$8,500',
-    deadline: 'Nov 30, 2026',
-    proposals: 2,
-  },
-  {
-    id: 'proj-3',
-    title: 'Supply Chain Resilience for APAC Manufacturing',
-    description: 'Tier-1 supplier audit and contingency logistics plan for our Southeast Asia manufacturing footprint.',
-    status: 'draft',
-    domain: 'Operations & Supply Chain',
-    expertsHired: 0,
-    budget: '$6,000',
-    deadline: 'Dec 20, 2026',
-    proposals: 0,
-  },
-  {
-    id: 'proj-4',
-    title: 'FDA 510(k) Pre-Submission Review',
-    description: 'Regulatory strategy and biocompatibility documentation review for our medical monitoring wearable.',
-    status: 'completed',
-    domain: 'Life Sciences & Healthcare',
-    expertsHired: 1,
-    budget: '$9,200',
-    deadline: 'Oct 01, 2026',
-    proposals: 4,
-  },
-];
-
-const DEMO_MESSAGES = [
-  {
-    id: 'msg-1',
-    expertName: 'Dr. Arthur Pendelton',
-    expertAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
-    lastMessage: "I've reviewed the cache coherence diagram. A few critical issues to flag before tape-out.",
-    time: '10:42 AM',
-    unread: 2,
-  },
-  {
-    id: 'msg-2',
-    expertName: 'Margaret Vance, CFA',
-    expertAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150',
-    lastMessage: "The debt covenant structure looks reasonable. Let's discuss the carve-outs on Thursday.",
-    time: 'Yesterday',
-    unread: 0,
-  },
-  {
-    id: 'msg-3',
-    expertName: 'Robert Chen, PE',
-    expertAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
-    lastMessage: 'Attached the vendor audit checklist. Three critical suppliers need immediate re-qualification.',
-    time: 'Mon',
-    unread: 1,
-  },
-];
-
-const DEMO_AI_RECOMMENDATIONS = [
-  {
-    expertId: 1,
-    matchScore: 98,
-    matchReason: 'Deep VLSI tape-out experience aligns precisely with your Edge AI Accelerator project scope and timeline.',
-    matchedSkills: ['VLSI Chip Design', 'System Architecture', 'Semiconductor R&D'],
-  },
-  {
-    expertId: 4,
-    matchScore: 97,
-    matchReason: 'FDA regulatory pathway expertise directly addresses your 510(k) wearable device submission needs.',
-    matchedSkills: ['FDA 510(k) & PMA', 'Clinical Trial Protocols', 'Biotech IP Strategy'],
-  },
-  {
-    expertId: 2,
-    matchScore: 95,
-    matchReason: 'Extensive Series B advisory experience and capital-markets governance matches your upcoming fundraise.',
-    matchedSkills: ['M&A Due Diligence', 'Series A–C Valuation', 'Financial Governance'],
-  },
-];
-
-const DEMO_RECENT_ACTIVITY = [
-  { id: 1, icon: CheckCircle2, color: 'green',  text: 'Booking confirmed with Dr. Arthur Pendelton',            time: '2 hours ago'  },
-  { id: 2, icon: Star,         color: 'amber',  text: 'You left a 5-star review for Robert Chen, PE',          time: 'Yesterday'    },
-  { id: 3, icon: Briefcase,    color: 'blue',   text: 'New project "FDA 510(k)" marked as completed',           time: '2 days ago'   },
-  { id: 4, icon: MessageSquare,color: 'forest', text: 'New message from Margaret Vance, CFA',                  time: '3 days ago'   },
-  { id: 5, icon: Sparkles,     color: 'purple', text: '3 new AI-recommended experts matched your projects',     time: '4 days ago'   },
-];
-
-const DEMO_REVIEWS = [
-  {
-    id: 'rev-1',
-    expertName: 'Robert Chen, PE',
-    expertTitle: 'Former Chief Operations & Supply Officer',
-    expertAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
-    project: 'Supply Chain Audit',
-    rating: 5,
-    date: 'Oct 2, 2026',
-    review: 'Robert\'s Lean Six Sigma analysis of our APAC suppliers saved us weeks of delay. Exceptional clarity and actionable recommendations.',
-  },
-  {
-    id: 'rev-2',
-    expertName: 'Harold Jenkins, JD',
-    expertTitle: 'Former General Counsel',
-    expertAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150',
-    project: 'ITAR Compliance Review',
-    rating: 5,
-    date: 'Sep 18, 2026',
-    review: 'Thorough, precise, and efficient. Harold navigated our dual-use export control issues with remarkable expertise.',
-  },
-];
+const DEMO_BOOKINGS = [];
+const DEMO_PROJECTS = [];
+const DEMO_MESSAGES = [];
+const DEMO_REVIEWS = [];
+const initialExperts = [];
 
 // ─── Reusable sub-components ──────────────────────────────────────────────────
 
@@ -210,6 +51,29 @@ function StatCard({ stat }) {
       <div className="cp-stat-value">{stat.value}</div>
       <div className="cp-stat-label">{stat.label}</div>
       <div className="cp-stat-trend">{stat.trend}</div>
+    </div>
+  );
+}
+
+function CatalogHeading({ eyebrow, title, description, action }) {
+  return (
+    <div className="cp-projects-heading">
+      <div>
+        <span className="cp-projects-eyebrow">{eyebrow}</span>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function CatalogStat({ icon: Icon, value, label, tone = 'active' }) {
+  return (
+    <div className={`cp-project-stat cp-project-stat--${tone}`}>
+      <span className="cp-project-stat__icon"><Icon size={23} /></span>
+      <strong>{value}</strong>
+      <span className="cp-project-stat__label"><i /> {label}</span>
     </div>
   );
 }
@@ -315,133 +179,63 @@ function Stars({ count }) {
 
 // ─── View: Overview Dashboard ─────────────────────────────────────────────────
 
-function ViewOverview({ onView, onBook, onNav }) {
-  const aiExperts = DEMO_AI_RECOMMENDATIONS.map(rec => ({
-    ...initialExperts.find(e => e.id === rec.expertId),
-    ...rec,
-  }));
-
+function DashboardEmpty({ icon: Icon, title, description, action, onClick }) {
   return (
-    <div className="cp-view">
-      {/* Welcome */}
-      <div className="cp-welcome">
-        <div>
-          <h2 className="cp-welcome__title">Welcome back, {DEMO_COMPANY.name} 👋</h2>
-          <p className="cp-welcome__sub">
-            Find experienced professionals, manage consultations, and accelerate your projects.
-          </p>
-        </div>
-        <button className="cp-btn cp-btn--primary" onClick={() => onNav('find-experts')}>
-          <Search size={15} /> Find Experts
-        </button>
-      </div>
+    <div className="cp-dashboard-empty">
+      <span className="cp-dashboard-empty__icon"><Icon size={19} /></span>
+      <strong>{title}</strong>
+      <p>{description}</p>
+      {action && <button className="cp-link" onClick={onClick}>{action}<ArrowRight size={13} /></button>}
+    </div>
+  );
+}
 
-      {/* Stats */}
-      <div className="cp-stats-grid">
-        {DEMO_STATS.map((s, i) => <StatCard key={i} stat={s} />)}
-      </div>
-
-      {/* Upcoming Consultations */}
-      <section className="cp-section">
-        <div className="cp-section__header">
-          <h3 className="cp-section__title">Upcoming Consultations</h3>
-          <button className="cp-link" onClick={() => onNav('bookings')}>View all</button>
-        </div>
-        <div className="cp-bookings-list">
-          {DEMO_BOOKINGS.slice(0, 3).map(bk => (
-            <div key={bk.id} className="cp-booking-row">
-              <img src={bk.expertAvatar} alt={bk.expertName} className="cp-booking-avatar" />
-              <div className="cp-booking-info">
-                <span className="cp-booking-expert">{bk.expertName}</span>
-                <span className="cp-booking-project">{bk.project}</span>
-                <span className="cp-booking-time">{bk.date} · {bk.time} · {bk.duration}</span>
-              </div>
-              <div className="cp-booking-right">
-                <StatusBadge status={bk.status} />
-                <span className="cp-booking-fee">{bk.fee}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* AI Recommended Experts */}
-      <section className="cp-section">
-        <div className="cp-section__header">
-          <div>
-            <h3 className="cp-section__title">
-              <Sparkles size={16} className="cp-section__icon cp-section__icon--ai" />
-              AI Recommended Experts
-            </h3>
-            <p className="cp-section__note cp-demo-note">
-              ✦ Illustrative demo data — recommendations will be powered by a matching algorithm in production.
-            </p>
+function ViewOverview({ onNav, companyProfile }) {
+  return (
+    <div className="cp-view cp-view--dashboard">
+      <section className="cp-dashboard-hero">
+        <div className="cp-dashboard-hero__content">
+          <span className="cp-dashboard-hero__eyebrow">COMPANY PORTAL</span>
+          <h1>Welcome back, {companyProfile?.company_name || 'Your company'} <span aria-hidden="true">👋</span></h1>
+          <p>Find the right expertise, start meaningful collaborations, and bring your projects to life.</p>
+          <div className="cp-dashboard-hero__actions">
+            <button className="cp-btn cp-btn--primary" onClick={() => onNav('projects')}><Plus size={15} /> Post a New Project</button>
+            <button className="cp-btn cp-btn--hero-ghost" onClick={() => onNav('find-experts')}><Search size={15} /> Find Experts</button>
           </div>
-          <button className="cp-link" onClick={() => onNav('find-experts')}>Browse all</button>
         </div>
-        <div className="cp-ai-grid">
-          {aiExperts.map((exp) => (
-            <div key={exp.id} className="cp-ai-card">
-              <img src={exp.avatar} alt={exp.name} className="cp-ai-card__avatar" />
-              <div className="cp-ai-card__body">
-                <div className="cp-ai-card__name-row">
-                  <span className="cp-ai-card__name">{exp.name}</span>
-                  <span className="cp-badge cp-badge--match">{exp.matchScore}% match</span>
-                </div>
-                <span className="cp-ai-card__title">{exp.title}</span>
-                <p className="cp-ai-card__reason">{exp.matchReason}</p>
-                <div className="cp-ai-card__skills">
-                  {exp.matchedSkills.map((s, i) => <span key={i} className="cp-skill-tag cp-skill-tag--ai">{s}</span>)}
-                </div>
-              </div>
-              <button className="cp-btn cp-btn--ghost cp-ai-card__btn" onClick={() => onBook(exp)}>
-                Request Consultation
-              </button>
-            </div>
-          ))}
-        </div>
+        <div className="cp-dashboard-hero__art" aria-hidden="true"><span /><span /><span /></div>
       </section>
 
-      {/* Recently Viewed */}
-      <section className="cp-section">
-        <div className="cp-section__header">
-          <h3 className="cp-section__title">
-            <Eye size={16} className="cp-section__icon" />
-            Recently Viewed Experts
-          </h3>
-        </div>
-        <div className="cp-recent-experts">
-          {initialExperts.slice(0, 4).map(exp => (
-            <div key={exp.id} className="cp-recent-expert" onClick={() => onView(exp)}>
-              <img src={exp.avatar} alt={exp.name} className="cp-recent-expert__avatar" />
-              <span className="cp-recent-expert__name">{exp.name}</span>
-              <span className="cp-recent-expert__domain">{exp.domain}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="cp-stats-grid cp-dashboard-stats">
+        {DEMO_STATS.map((stat) => <StatCard key={stat.label} stat={stat} />)}
+      </div>
 
-      {/* Recent Activity */}
-      <section className="cp-section">
-        <h3 className="cp-section__title">
-          <Activity size={16} className="cp-section__icon" />
-          Recent Activity
-        </h3>
-        <div className="cp-activity-list">
-          {DEMO_RECENT_ACTIVITY.map(item => {
-            const Icon = item.icon;
-            return (
-              <div key={item.id} className="cp-activity-row">
-                <span className={`cp-activity-icon cp-activity-icon--${item.color}`}>
-                  <Icon size={14} />
-                </span>
-                <span className="cp-activity-text">{item.text}</span>
-                <span className="cp-activity-time">{item.time}</span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <div className="cp-dashboard-grid">
+        <section className="cp-dashboard-panel cp-dashboard-panel--activity">
+          <div className="cp-dashboard-panel__header"><h2>Recent Activity</h2><span>Updates from your workspace</span></div>
+          <DashboardEmpty icon={Activity} title="Nothing here yet" description="Your project, booking, and collaboration updates will appear here." />
+        </section>
+
+        <section className="cp-dashboard-panel cp-dashboard-panel--projects">
+          <div className="cp-dashboard-panel__header"><h2>Your Projects</h2><button className="cp-link" onClick={() => onNav('projects')}>View all <ArrowRight size={13} /></button></div>
+          <DashboardEmpty icon={Briefcase} title="Start with a project" description="Describe the support you need and invite experts to collaborate." action="Create a project" onClick={() => onNav('projects')} />
+        </section>
+
+        <section className="cp-dashboard-panel cp-dashboard-panel--bookings">
+          <div className="cp-dashboard-panel__header"><h2>Upcoming Consultations</h2><button className="cp-link" onClick={() => onNav('bookings')}>View all <ArrowRight size={13} /></button></div>
+          <DashboardEmpty icon={Calendar} title="No consultations booked" description="Once you book a consultation, the details will appear here." />
+        </section>
+
+        <section className="cp-dashboard-panel cp-dashboard-panel--matches">
+          <div className="cp-dashboard-panel__header"><h2>Expert Matches</h2><button className="cp-link" onClick={() => onNav('find-experts')}>Browse directory <ArrowRight size={13} /></button></div>
+          <DashboardEmpty icon={Users} title="Expert profiles are being prepared" description="We’ll show verified expert details here when real profiles are available." action="Open expert directory" onClick={() => onNav('find-experts')} />
+        </section>
+
+        <section className="cp-dashboard-panel cp-dashboard-panel--messages">
+          <div className="cp-dashboard-panel__header"><h2>Messages</h2><button className="cp-link" onClick={() => onNav('messages')}>View all <ArrowRight size={13} /></button></div>
+          <DashboardEmpty icon={MessageSquare} title="No conversations yet" description="Messages will appear here when you connect with an expert." />
+        </section>
+      </div>
     </div>
   );
 }
@@ -480,12 +274,12 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
     });
 
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Find Experts</h2>
-          <p className="cp-page-header__sub">Search {initialExperts.length} verified retired professionals.</p>
-        </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="EXPERT DIRECTORY" title="Find Experts" description="Explore verified professionals by skills, experience, and focus area." />
+      <div className="cp-project-stats">
+        <CatalogStat icon={Users} value={initialExperts.length} label="Expert Profiles" />
+        <CatalogStat icon={CircleCheck} value={initialExperts.length} label="Verified Experts" tone="completed" />
+        <CatalogStat icon={Bookmark} value={0} label="Saved Experts" tone="draft" />
       </div>
 
       {/* Search & Sort bar */}
@@ -564,10 +358,12 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="cp-empty">
-          <Search size={40} />
-          <p>No experts match your search. Try adjusting the filters.</p>
-        </div>
+        <section className="cp-project-empty cp-project-empty--catalog">
+          <div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={82} /></div>
+          <div className="cp-project-empty__art"><Search size={88} strokeWidth={1.3} /></div>
+          <h2>{initialExperts.length === 0 ? 'Expert profiles are being prepared' : 'No experts match your search'}</h2>
+          <p>{initialExperts.length === 0 ? 'We’ll show verified professional profiles here when real expert details are available.' : 'Try changing your search or filters to see more results.'}</p>
+        </section>
       ) : (
         <div className="cp-experts-list">
           {filtered.map(exp => (
@@ -590,7 +386,6 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
 
 function ViewProjects() {
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', description: '', domain: '', budget: '' });
 
   const statusCounts = {
     active:    DEMO_PROJECTS.filter(p => p.status === 'active').length,
@@ -598,59 +393,38 @@ function ViewProjects() {
     completed: DEMO_PROJECTS.filter(p => p.status === 'completed').length,
   };
 
+  if (showForm) return <ProjectCreationWizard onBack={() => setShowForm(false)} />;
+
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
+    <div className="cp-view cp-view--projects">
+      <div className="cp-projects-heading">
         <div>
-          <h2 className="cp-page-header__title">My Projects</h2>
-          <p className="cp-page-header__sub">{statusCounts.active} active · {statusCounts.draft} draft · {statusCounts.completed} completed</p>
+          <span className="cp-projects-eyebrow">MY PROJECTS</span>
+          <h1>My Projects</h1>
+          <p>Create, manage, and track your projects with expert support.</p>
         </div>
         <button className="cp-btn cp-btn--primary" onClick={() => setShowForm(f => !f)}>
           <Plus size={15} /> New Project
         </button>
       </div>
 
-      {/* Create project form */}
-      {showForm && (
-        <div className="cp-form-card">
-          <h3 className="cp-form-card__title">Create New Project</h3>
-          <p className="cp-demo-note">✦ Demo UI — form submission is not yet connected to the backend.</p>
-          <div className="cp-form-grid">
-            <div className="cp-form-field cp-form-field--full">
-              <label htmlFor="proj-title">Project Title</label>
-              <input id="proj-title" type="text" placeholder="e.g. VLSI Architecture Review" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-            </div>
-            <div className="cp-form-field">
-              <label htmlFor="proj-domain">Domain</label>
-              <select id="proj-domain" value={form.domain} onChange={e => setForm({...form, domain: e.target.value})}>
-                <option value="">Select domain…</option>
-                <option>Technology & Hardware</option>
-                <option>Finance & M&A</option>
-                <option>Operations & Supply Chain</option>
-                <option>Life Sciences & Healthcare</option>
-                <option>Legal & Regulatory</option>
-                <option>Business Strategy & Governance</option>
-              </select>
-            </div>
-            <div className="cp-form-field">
-              <label htmlFor="proj-budget">Budget</label>
-              <input id="proj-budget" type="text" placeholder="e.g. $5,000" value={form.budget} onChange={e => setForm({...form, budget: e.target.value})} />
-            </div>
-            <div className="cp-form-field cp-form-field--full">
-              <label htmlFor="proj-desc">Description</label>
-              <textarea id="proj-desc" rows={3} placeholder="Describe the scope, deliverables, and required expertise…" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-            </div>
-          </div>
-          <div className="cp-form-actions">
-            <button className="cp-btn cp-btn--ghost" onClick={() => setShowForm(false)}>Cancel</button>
-            <button className="cp-btn cp-btn--primary" onClick={() => { alert('Project creation will be available once the backend endpoint is connected.'); setShowForm(false); }}>
-              Save Project
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="cp-project-stats">
+        <div className="cp-project-stat cp-project-stat--active"><span className="cp-project-stat__icon"><Briefcase size={23} /></span><strong>{statusCounts.active}</strong><span className="cp-project-stat__label"><i /> Active Projects</span></div>
+        <div className="cp-project-stat cp-project-stat--draft"><span className="cp-project-stat__icon"><FileText size={23} /></span><strong>{statusCounts.draft}</strong><span className="cp-project-stat__label"><i /> Draft Projects</span></div>
+        <div className="cp-project-stat cp-project-stat--completed"><span className="cp-project-stat__icon"><CircleCheck size={23} /></span><strong>{statusCounts.completed}</strong><span className="cp-project-stat__label"><i /> Completed Projects</span></div>
+      </div>
 
-      <div className="cp-projects-list">
+      {DEMO_PROJECTS.length === 0 ? (
+        <section className="cp-project-empty">
+          <div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={88} /></div>
+          <div className="cp-project-empty__leaf cp-project-empty__leaf--bottom"><Leaf size={102} /></div>
+          <div className="cp-project-empty__art"><Monitor size={146} strokeWidth={1.2} /><Briefcase className="cp-project-empty__briefcase" size={40} strokeWidth={1.6} /></div>
+          <h2>No projects yet</h2>
+          <p>Create a project to describe the expertise and support<br className="cp-project-empty__desktop-break" /> your team is looking for.</p>
+          <button className="cp-btn cp-btn--primary" onClick={() => setShowForm(true)}><Plus size={17} /> Create Your First Project</button>
+        </section>
+      ) : (
+        <div className="cp-projects-list">
         {DEMO_PROJECTS.map(proj => (
           <div key={proj.id} className="cp-project-card">
             <div className="cp-project-card__header">
@@ -671,7 +445,8 @@ function ViewProjects() {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -685,15 +460,16 @@ function ViewBookings() {
   const cancel  = (id) => setBookings(bs => bs.filter(b => b.id !== id));
 
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Bookings</h2>
-          <p className="cp-page-header__sub">Consultation requests and upcoming sessions.</p>
-        </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="CONSULTATIONS" title="Bookings" description="Manage consultation requests and upcoming sessions with experts." />
+      <div className="cp-project-stats">
+        <CatalogStat icon={Calendar} value={bookings.length} label="Upcoming Bookings" />
+        <CatalogStat icon={Clock} value={bookings.filter((booking) => booking.status === 'pending').length} label="Pending Requests" tone="draft" />
+        <CatalogStat icon={CircleCheck} value={bookings.filter((booking) => booking.status === 'confirmed').length} label="Confirmed Sessions" tone="completed" />
       </div>
 
       <div className="cp-bookings-detail-list">
+        {bookings.length === 0 && <section className="cp-project-empty cp-project-empty--catalog"><div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={80} /></div><div className="cp-project-empty__art"><Calendar size={88} strokeWidth={1.3} /></div><h2>No bookings yet</h2><p>Consultations you book with verified experts will be listed here.</p></section>}
         {bookings.map(bk => (
           <div key={bk.id} className="cp-booking-detail-card">
             <img src={bk.expertAvatar} alt={bk.expertName} className="cp-booking-detail-avatar" />
@@ -736,29 +512,9 @@ function ViewBookings() {
 // ─── View: Messages ───────────────────────────────────────────────────────────
 
 function ViewMessages() {
-  const [activeConv, setActiveConv] = useState(DEMO_MESSAGES[0]);
+  const [activeConv, setActiveConv] = useState(null);
   const [text, setText] = useState('');
-
-  const [convMessages, setConvMessages] = useState([
-    {
-      id: 1,
-      from: 'expert',
-      text: "Hello! I've had a chance to look at your tape-out schedule.",
-      time: '10:30 AM',
-    },
-    {
-      id: 2,
-      from: 'expert',
-      text: "I've reviewed the cache coherence diagram. A few critical issues to flag before tape-out.",
-      time: '10:42 AM',
-    },
-    {
-      id: 3,
-      from: 'me',
-      text: 'Thank you for the quick turnaround, Dr. Pendelton. Please share your notes.',
-      time: '10:55 AM',
-    },
-  ]);
+  const [convMessages, setConvMessages] = useState([]);
 
 
   const send = () => {
@@ -766,6 +522,25 @@ function ViewMessages() {
     setConvMessages(m => [...m, { id: Date.now(), from: 'me', text: text.trim(), time: 'Now' }]);
     setText('');
   };
+
+  if (DEMO_MESSAGES.length === 0) {
+    return (
+      <div className="cp-view cp-view--catalog">
+        <CatalogHeading eyebrow="YOUR INBOX" title="Messages" description="Keep your expert conversations and project updates in one place." />
+        <div className="cp-project-stats">
+          <CatalogStat icon={MessageSquare} value="0" label="Conversations" />
+          <CatalogStat icon={Bell} value="0" label="Unread Messages" tone="draft" />
+          <CatalogStat icon={Users} value="0" label="Expert Connections" tone="completed" />
+        </div>
+        <section className="cp-project-empty cp-project-empty--catalog">
+          <div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={80} /></div>
+          <div className="cp-project-empty__art"><MessageSquare size={88} strokeWidth={1.3} /></div>
+          <h2>No conversations yet</h2>
+          <p>Once you connect with verified experts, your messages will appear here.</p>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="cp-view cp-view--messages">
@@ -792,6 +567,7 @@ function ViewMessages() {
               </div>
             </button>
           ))}
+          {DEMO_MESSAGES.length === 0 && <DashboardEmpty icon={MessageSquare} title="No messages yet" description="Your conversations will appear here after you connect with an expert." />}
         </aside>
 
         {/* Message panel */}
@@ -842,19 +618,16 @@ function ViewSavedExperts({ savedExperts, onSave, onView, onBook }) {
   const saved = initialExperts.filter(e => savedExperts.includes(e.id));
 
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Saved Experts</h2>
-          <p className="cp-page-header__sub">{saved.length} expert{saved.length !== 1 ? 's' : ''} bookmarked</p>
-        </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="YOUR SHORTLIST" title="Saved Experts" description="Keep promising professional profiles close at hand." />
+      <div className="cp-project-stats">
+        <CatalogStat icon={Bookmark} value={saved.length} label="Saved Experts" />
+        <CatalogStat icon={Users} value={saved.length} label="Available Profiles" tone="completed" />
+        <CatalogStat icon={MessageSquare} value="0" label="New Updates" tone="draft" />
       </div>
 
       {saved.length === 0 ? (
-        <div className="cp-empty">
-          <Bookmark size={40} />
-          <p>No saved experts yet. Browse the Find Experts page to bookmark professionals.</p>
-        </div>
+        <section className="cp-project-empty cp-project-empty--catalog"><div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={80} /></div><div className="cp-project-empty__art"><Bookmark size={88} strokeWidth={1.3} /></div><h2>No saved experts yet</h2><p>Save verified profiles from the expert directory and they’ll be collected here.</p></section>
       ) : (
         <div className="cp-experts-list">
           {saved.map(exp => (
@@ -877,14 +650,15 @@ function ViewSavedExperts({ savedExperts, onSave, onView, onBook }) {
 
 function ViewReviews() {
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Reviews</h2>
-          <p className="cp-page-header__sub">Your reviews of engaged experts.</p>
-        </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="YOUR FEEDBACK" title="Reviews" description="Review your completed consultations and share feedback." />
+      <div className="cp-project-stats">
+        <CatalogStat icon={Star} value={DEMO_REVIEWS.length} label="Reviews Written" />
+        <CatalogStat icon={CircleCheck} value={DEMO_REVIEWS.length} label="Completed Sessions" tone="completed" />
+        <CatalogStat icon={Star} value="—" label="Average Rating" tone="draft" />
       </div>
       <div className="cp-reviews-list">
+        {DEMO_REVIEWS.length === 0 && <section className="cp-project-empty cp-project-empty--catalog"><div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={80} /></div><div className="cp-project-empty__art"><Star size={88} strokeWidth={1.3} /></div><h2>No reviews yet</h2><p>Your feedback will appear here after completed consultations.</p></section>}
         {DEMO_REVIEWS.map(rev => (
           <div key={rev.id} className="cp-review-card">
             <img src={rev.expertAvatar} alt={rev.expertName} className="cp-review-avatar" />
@@ -907,31 +681,40 @@ function ViewReviews() {
   );
 }
 
+function ViewAnalytics() {
+  return (
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="WORKSPACE INSIGHTS" title="Analytics" description="Understand your project activity and expert collaborations." />
+      <div className="cp-project-stats">
+        <CatalogStat icon={Briefcase} value="0" label="Projects Tracked" />
+        <CatalogStat icon={Calendar} value="0" label="Consultations" tone="draft" />
+        <CatalogStat icon={TrendingUp} value="—" label="Engagement Trend" tone="completed" />
+      </div>
+      <section className="cp-project-empty cp-project-empty--catalog"><div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={80} /></div><div className="cp-project-empty__art"><BarChart3 size={88} strokeWidth={1.3} /></div><h2>Analytics will appear here</h2><p>Once you have projects and consultations, your company’s activity will be summarized here.</p></section>
+    </div>
+  );
+}
+
 // ─── View: Company Profile ────────────────────────────────────────────────────
 
-function ViewCompanyProfile() {
+function ViewCompanyProfile({ companyProfile }) {
   const [form, setForm] = useState({
-    name: DEMO_COMPANY.name,
-    industry: 'Deep Tech',
-    size: '51–200 employees',
-    website: 'https://acrotechdynamics.com',
-    location: 'Palo Alto, CA',
-    about: 'AcroTech Dynamics is a deep tech company building edge AI acceleration chips for autonomous robotics and industrial automation.',
-    focusAreas: 'VLSI Architecture, FDA Regulatory, Finance & M&A',
+    name: companyProfile?.company_name || '',
+    industry: companyProfile?.industry || '',
+    size: '',
+    website: companyProfile?.website || '',
+    location: companyProfile?.location || '',
+    about: companyProfile?.description || '',
+    focusAreas: companyProfile?.industry || '',
   });
 
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Company Profile</h2>
-          <p className="cp-page-header__sub">How experts see your organization.</p>
-        </div>
-      </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="YOUR ORGANIZATION" title="Company Profile" description="Manage the details professionals see about your company." />
 
       <div className="cp-form-card">
         <div className="cp-profile-avatar-row">
-          <div className="cp-profile-avatar">{DEMO_COMPANY.initials}</div>
+          <div className="cp-profile-avatar">{form.name.slice(0, 2).toUpperCase() || 'CO'}</div>
           <div>
             <span className="cp-profile-avatar-name">{form.name}</span>
             <span className="cp-profile-avatar-sub">{form.industry}</span>
@@ -990,13 +773,8 @@ function ViewSettings() {
   const [privacy, setPrivacy]             = useState({ showCompany: true });
 
   return (
-    <div className="cp-view">
-      <div className="cp-page-header">
-        <div>
-          <h2 className="cp-page-header__title">Settings</h2>
-          <p className="cp-page-header__sub">Preferences and account configuration.</p>
-        </div>
-      </div>
+    <div className="cp-view cp-view--catalog">
+      <CatalogHeading eyebrow="PREFERENCES" title="Settings" description="Manage your company portal preferences and account settings." />
 
       <div className="cp-settings-sections">
         <div className="cp-form-card">
@@ -1059,20 +837,21 @@ function ViewSettings() {
 // ─── Main CompanyPortal Component ─────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { id: 'overview',         label: 'Overview',        icon: LayoutDashboard },
+  { id: 'overview',         label: 'Dashboard',       icon: LayoutDashboard },
   { id: 'find-experts',     label: 'Find Experts',    icon: Search          },
-  { id: 'projects',         label: 'My Projects',     icon: Briefcase,  badge: '4' },
-  { id: 'bookings',         label: 'Bookings',        icon: Calendar,   badge: '3' },
-  { id: 'messages',         label: 'Messages',        icon: MessageSquare, badge: '3' },
+  { id: 'projects',         label: 'My Projects',     icon: Briefcase },
+  { id: 'bookings',         label: 'Bookings',        icon: Calendar },
+  { id: 'messages',         label: 'Messages',        icon: MessageSquare },
   { id: 'saved-experts',    label: 'Saved Experts',   icon: Bookmark        },
-  { id: 'reviews',          label: 'Reviews',         icon: Star            },
   { id: 'company-profile',  label: 'Company Profile', icon: Building2       },
+  { id: 'reviews',          label: 'Reviews',         icon: Star            },
+  { id: 'analytics',        label: 'Analytics',       icon: BarChart3       },
   { id: 'settings',         label: 'Settings',        icon: Settings        },
 ];
 
-export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }) {
+export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout, companyProfile }) {
   const [activeNav,    setActiveNav]    = useState('overview');
-  const [savedExperts, setSavedExperts] = useState([1, 2]);
+  const [savedExperts, setSavedExperts] = useState([]);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
   const toggleSave = useCallback((id) => {
@@ -1095,14 +874,15 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }
   const renderView = () => {
     const sharedProps = { savedExperts, onSave: toggleSave, onView: handleView, onBook: handleBook };
     switch (activeNav) {
-      case 'overview':        return <ViewOverview       {...sharedProps} onNav={navTo} />;
+      case 'overview':        return <ViewOverview       {...sharedProps} companyProfile={companyProfile} onNav={navTo} />;
       case 'find-experts':    return <ViewFindExperts    {...sharedProps} />;
       case 'projects':        return <ViewProjects />;
       case 'bookings':        return <ViewBookings />;
       case 'messages':        return <ViewMessages />;
       case 'saved-experts':   return <ViewSavedExperts   {...sharedProps} />;
       case 'reviews':         return <ViewReviews />;
-      case 'company-profile': return <ViewCompanyProfile />;
+      case 'analytics':       return <ViewAnalytics />;
+      case 'company-profile': return <ViewCompanyProfile companyProfile={companyProfile} />;
       case 'settings':        return <ViewSettings />;
       default:                return <ViewOverview       {...sharedProps} onNav={navTo} />;
     }
@@ -1121,23 +901,21 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }
           >
             <Menu size={20} />
           </button>
-          <button className="cp-header__back" onClick={onReturnHome} aria-label="Return to home">
-            <ArrowLeft size={16} />
-            <span className="cp-header__back-text">ElderExpert</span>
-          </button>
-          <span className="cp-header__divider" />
-          <span className="cp-header__workspace">Enterprise Hirer Workspace</span>
         </div>
+        <button className="cp-global-search" onClick={() => navTo('find-experts')} type="button">
+          <Search size={16} />
+          <span>Search experts by skills, experience, or keywords…</span>
+        </button>
         <div className="cp-header__right">
           <button className="cp-header__notif" aria-label="Notifications">
             <Bell size={18} />
             <span className="cp-header__notif-dot" />
           </button>
           <div className="cp-header__company">
-            <div className="cp-header__company-avatar">{DEMO_COMPANY.initials}</div>
+              <div className="cp-header__company-avatar">{(companyProfile?.company_name || DEMO_COMPANY.name).slice(0, 2).toUpperCase()}</div>
             <div className="cp-header__company-info">
-              <span className="cp-header__company-name">{DEMO_COMPANY.name}</span>
-              <span className="cp-header__company-sub">{DEMO_COMPANY.industry}</span>
+                <span className="cp-header__company-name">{companyProfile?.company_name || DEMO_COMPANY.name}</span>
+                <span className="cp-header__company-sub">{companyProfile?.industry || DEMO_COMPANY.industry}</span>
             </div>
           </div>
           <button className="cp-header__logout" onClick={onLogout} type="button" title="Sign out">
@@ -1160,6 +938,10 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }
 
         {/* ── Left Sidebar ─────────────────────────────────────────────── */}
         <aside className={`cp-sidebar ${sidebarOpen ? 'cp-sidebar--open' : ''}`}>
+          <button className="cp-sidebar__brand" onClick={onReturnHome} type="button" aria-label="Return to ElderExpert home">
+            <span className="cp-sidebar__brand-mark">E</span>
+            <span><strong>ElderExpert</strong><small>COMPANY PORTAL</small></span>
+          </button>
           <nav className="cp-sidebar__nav">
             {NAV_ITEMS.map(item => {
               const Icon = item.icon;
@@ -1173,11 +955,7 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }
                 >
                   <Icon size={17} />
                   <span className="cp-nav-item__label">{item.label}</span>
-                  {item.badge && (
-                    <span className={`cp-nav-badge ${isActive ? 'cp-nav-badge--active' : ''}`}>
-                      {item.id === 'saved-experts' ? savedExperts.length : item.badge}
-                    </span>
-                  )}
+                  {item.id === 'saved-experts' && savedExperts.length > 0 && <span className={`cp-nav-badge ${isActive ? 'cp-nav-badge--active' : ''}`}>{savedExperts.length}</span>}
                 </button>
               );
             })}
@@ -1185,10 +963,10 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout }
 
           {/* Company snippet at sidebar bottom */}
           <div className="cp-sidebar__company">
-            <div className="cp-sidebar__company-avatar">{DEMO_COMPANY.initials}</div>
+            <div className="cp-sidebar__company-avatar">{(companyProfile?.company_name || DEMO_COMPANY.name).slice(0, 2).toUpperCase()}</div>
             <div className="cp-sidebar__company-info">
-              <span className="cp-sidebar__company-name">{DEMO_COMPANY.name}</span>
-              <span className="cp-sidebar__company-sub">Corporate Account</span>
+              <span className="cp-sidebar__company-name">{companyProfile?.company_name || DEMO_COMPANY.name}</span>
+              <span className="cp-sidebar__company-sub">{companyProfile?.industry || 'Corporate Account'}</span>
             </div>
           </div>
         </aside>
