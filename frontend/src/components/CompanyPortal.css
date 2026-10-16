@@ -1400,8 +1400,10 @@
   .cp-dashboard-stats { grid-template-columns: 1fr 1fr; }
   .cp-dashboard-hero { padding: 20px 18px; }
   .cp-dashboard-hero h1 { max-width: 300px; }
-  .cp-global-search { width: min(300px, calc(100vw - 190px)); min-width: 140px; font-size: 10px; }
   .cp-header { padding: 0 12px; }
+  .cp-header__left { flex: 0 0 auto; }
+  .cp-header__right { gap: 4px; }
+  .cp-global-search { position: static; flex: 1 1 auto; width: auto; min-width: 0; margin: 0 8px; font-size: 10px; transform: none; }
   .cp-dashboard-stats .cp-stat-card { padding: 11px; grid-template-columns: 32px 1fr; column-gap: 8px; }
   .cp-dashboard-stats .cp-stat-icon { width: 31px; height: 31px; }
   .cp-dashboard-stats .cp-stat-value { font-size: 20px; }
