@@ -35,6 +35,20 @@ export const authApi = {
   logout: () => api.post('/logout'),
 };
 
+export const companyProfileApi = {
+  mine: () => api.get('/companies/me'),
+  create: (profile) => api.post('/companies', profile),
+};
+
+export const expertProfileApi = {
+  mine: () => api.get('/experts/me'),
+  create: (profile) => api.post('/experts', profile, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update: (id, profile) => {
+    profile.append('_method', 'PUT');
+    return api.post(`/experts/${id}`, profile, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+};
+
 // Verified Retired Experts Directory
 export const initialExperts = [
   {

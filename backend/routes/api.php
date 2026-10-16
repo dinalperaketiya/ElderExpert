@@ -28,6 +28,8 @@ Route::get('/test', [TestController::class, 'test']);
 // Authentication
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/expert-profile-photos/{filename}', [ExpertProfileController::class, 'photo'])
+    ->where('filename', '[A-Za-z0-9._-]+');
 
 
 // ==========================================
@@ -45,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // EXPERTS
     // ======================================
 
+    Route::get('/experts/me', [ExpertProfileController::class, 'mine'])->middleware('role:expert');
     Route::get('/experts', [ExpertProfileController::class, 'index']);
     Route::get('/experts/{id}', [ExpertProfileController::class, 'show'])
         ->middleware('role:expert,admin');;
@@ -57,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // COMPANIES
     // ======================================
 
+    Route::get('/companies/me', [CompanyProfileController::class, 'mine']);
     Route::get('/companies', [CompanyProfileController::class, 'index']);
     Route::get('/companies/{id}', [CompanyProfileController::class, 'show']);
     Route::post('/companies', [CompanyProfileController::class, 'store']);
