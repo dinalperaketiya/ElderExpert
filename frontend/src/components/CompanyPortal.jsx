@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ProjectCreationWizard from './ProjectCreationWizard';
+import { projectApi } from '../services/api';
 import {
   LayoutDashboard, Search, Briefcase, Calendar, MessageSquare,
   Bookmark, Star, Building2, Settings,
@@ -8,6 +9,7 @@ import {
   X, Send, Menu, Plus, LogOut, ArrowRight, BarChart3, FileText, CircleCheck, Monitor, Leaf
 } from 'lucide-react';
 import './CompanyPortal.css';
+import './BrandLogo.css';
 
 // ─── Demo / mock data clearly marked as illustrative ─────────────────────────
 
@@ -26,7 +28,6 @@ const DEMO_STATS = [
 ];
 
 const DEMO_BOOKINGS = [];
-const DEMO_PROJECTS = [];
 const DEMO_MESSAGES = [];
 const DEMO_REVIEWS = [];
 const initialExperts = [];
@@ -155,13 +156,14 @@ function ExpertCard({ expert, isSaved, onSave, onView, onBook, compact = false }
 function StatusBadge({ status }) {
   const map = {
     active:    'cp-badge cp-badge--active',
+    published: 'cp-badge cp-badge--active',
     draft:     'cp-badge cp-badge--draft',
     completed: 'cp-badge cp-badge--completed',
     confirmed: 'cp-badge cp-badge--confirmed',
     pending:   'cp-badge cp-badge--pending',
   };
   const labels = {
-    active: 'Active', draft: 'Draft', completed: 'Completed',
+    active: 'Active', published: 'Published', draft: 'Draft', completed: 'Completed',
     confirmed: 'Confirmed', pending: 'Pending',
   };
   return <span className={map[status] || 'cp-badge'}>{labels[status] || status}</span>;
@@ -191,6 +193,23 @@ function DashboardEmpty({ icon: Icon, title, description, action, onClick }) {
 }
 
 function ViewOverview({ onNav, companyProfile }) {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    projectApi.mine()
+      .then(({ data }) => {
+        if (active) setProjects(data.data || []);
+      })
+      .catch(() => {})
+      .finally(() => { active = false; });
+    return () => { active = false; };
+  }, []);
+
+  const dashboardStats = DEMO_STATS.map((stat) => stat.label === 'Active Projects'
+    ? { ...stat, value: String(projects.filter((project) => project.status === 'published').length), trend: projects.length ? `${projects.length} saved project${projects.length === 1 ? '' : 's'}` : 'Create your first project' }
+    : stat);
+
   return (
     <div className="cp-view cp-view--dashboard">
       <section className="cp-dashboard-hero">
@@ -207,7 +226,7 @@ function ViewOverview({ onNav, companyProfile }) {
       </section>
 
       <div className="cp-stats-grid cp-dashboard-stats">
-        {DEMO_STATS.map((stat) => <StatCard key={stat.label} stat={stat} />)}
+        {dashboardStats.map((stat) => <StatCard key={stat.label} stat={stat} />)}
       </div>
 
       <div className="cp-dashboard-grid">
@@ -218,7 +237,9 @@ function ViewOverview({ onNav, companyProfile }) {
 
         <section className="cp-dashboard-panel cp-dashboard-panel--projects">
           <div className="cp-dashboard-panel__header"><h2>Your Projects</h2><button className="cp-link" onClick={() => onNav('projects')}>View all <ArrowRight size={13} /></button></div>
-          <DashboardEmpty icon={Briefcase} title="Start with a project" description="Describe the support you need and invite experts to collaborate." action="Create a project" onClick={() => onNav('projects')} />
+          {projects.length === 0
+            ? <DashboardEmpty icon={Briefcase} title="Start with a project" description="Describe the support you need and invite experts to collaborate." action="Create a project" onClick={() => onNav('projects')} />
+            : <div className="cp-dashboard-project-list">{projects.slice(0, 3).map((project) => <button className="cp-dashboard-project-row" key={project.id} onClick={() => onNav('projects')} type="button"><span><strong>{project.title}</strong><small>{project.category || 'Draft'} · {project.status}</small></span><ArrowRight size={15} /></button>)}</div>}
         </section>
 
         <section className="cp-dashboard-panel cp-dashboard-panel--bookings">
@@ -386,14 +407,32 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
 
 function ViewProjects() {
   const [showForm, setShowForm] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [projectError, setProjectError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    projectApi.mine()
+      .then(({ data }) => {
+        if (active) setProjects(data.data || []);
+      })
+      .catch(() => {
+        if (active) setProjectError('Could not load your projects. Please refresh and try again.');
+      })
+      .finally(() => {
+        if (active) setLoadingProjects(false);
+      });
+    return () => { active = false; };
+  }, []);
 
   const statusCounts = {
-    active:    DEMO_PROJECTS.filter(p => p.status === 'active').length,
-    draft:     DEMO_PROJECTS.filter(p => p.status === 'draft').length,
-    completed: DEMO_PROJECTS.filter(p => p.status === 'completed').length,
+    active:    projects.filter((project) => project.status === 'published').length,
+    draft:     projects.filter((project) => project.status === 'draft').length,
+    completed: projects.filter((project) => project.status === 'completed').length,
   };
 
-  if (showForm) return <ProjectCreationWizard onBack={() => setShowForm(false)} />;
+  if (showForm) return <ProjectCreationWizard onBack={() => setShowForm(false)} onSaved={(project) => { setProjects((current) => [project, ...current]); setShowForm(false); }} />;
 
   return (
     <div className="cp-view cp-view--projects">
@@ -414,7 +453,9 @@ function ViewProjects() {
         <div className="cp-project-stat cp-project-stat--completed"><span className="cp-project-stat__icon"><CircleCheck size={23} /></span><strong>{statusCounts.completed}</strong><span className="cp-project-stat__label"><i /> Completed Projects</span></div>
       </div>
 
-      {DEMO_PROJECTS.length === 0 ? (
+      {projectError && <p className="project-wizard__notice" role="alert">{projectError}</p>}
+
+      {loadingProjects ? <section className="cp-project-empty"><h2>Loading projects…</h2></section> : projects.length === 0 ? (
         <section className="cp-project-empty">
           <div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={88} /></div>
           <div className="cp-project-empty__leaf cp-project-empty__leaf--bottom"><Leaf size={102} /></div>
@@ -425,11 +466,11 @@ function ViewProjects() {
         </section>
       ) : (
         <div className="cp-projects-list">
-        {DEMO_PROJECTS.map(proj => (
+        {projects.map((proj) => (
           <div key={proj.id} className="cp-project-card">
             <div className="cp-project-card__header">
               <div>
-                <span className="cp-project-card__domain">{proj.domain}</span>
+                <span className="cp-project-card__domain">{proj.category || 'Project draft'}</span>
                 <h3 className="cp-project-card__title">{proj.title}</h3>
               </div>
               <div className="cp-project-card__status-area">
@@ -438,10 +479,10 @@ function ViewProjects() {
             </div>
             <p className="cp-project-card__desc">{proj.description}</p>
             <div className="cp-project-card__meta">
-              <span><Users size={13} /> {proj.expertsHired} expert{proj.expertsHired !== 1 ? 's' : ''} hired</span>
-              <span><TrendingUp size={13} /> {proj.proposals} proposal{proj.proposals !== 1 ? 's' : ''}</span>
-              <span><Briefcase size={13} /> Budget: {proj.budget}</span>
-              <span><Calendar size={13} /> Deadline: {proj.deadline}</span>
+              <span><Users size={13} /> {proj.experts_needed || '1 expert'} needed</span>
+              <span><TrendingUp size={13} /> {proj.required_skills?.length || 0} required skills</span>
+              <span><Briefcase size={13} /> Budget: {proj.budget || 'Negotiable'}</span>
+              <span><Calendar size={13} /> Deadline: {proj.preferred_completion_date || 'Not set'}</span>
             </div>
           </div>
         ))}
@@ -939,8 +980,7 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout, 
         {/* ── Left Sidebar ─────────────────────────────────────────────── */}
         <aside className={`cp-sidebar ${sidebarOpen ? 'cp-sidebar--open' : ''}`}>
           <button className="cp-sidebar__brand" onClick={onReturnHome} type="button" aria-label="Return to ElderExpert home">
-            <span className="cp-sidebar__brand-mark">E</span>
-            <span><strong>ElderExpert</strong><small>COMPANY PORTAL</small></span>
+            <span className="cp-sidebar__brand-copy"><strong>ElderExpert</strong><small>COMPANY PORTAL</small></span>
           </button>
           <nav className="cp-sidebar__nav">
             {NAV_ITEMS.map(item => {

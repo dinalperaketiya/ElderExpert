@@ -3,18 +3,20 @@ import {
   ArrowLeft, ArrowRight, Check, CheckCircle2,
   FileText, Lightbulb, Monitor, Sparkles, Upload, Users, X,
 } from 'lucide-react';
+import { projectApi } from '../services/api';
 import './ProjectCreationWizard.css';
 
 const steps = ['Project Details', 'Requirements', 'Review & Publish'];
 const categories = ['Technology & Software', 'Business Strategy', 'Finance & Accounting', 'Healthcare & Life Sciences', 'Operations & Supply Chain', 'Legal & Compliance', 'Marketing & Communications', 'Other'];
 
-export default function ProjectCreationWizard({ onBack }) {
+export default function ProjectCreationWizard({ onBack, onSaved }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ title: '', category: '', description: '', budget: '', duration: 'Less than 1 month', workArrangement: 'Remote', expertsNeeded: '1 expert', preferredDate: '', experience: 'Any Level', additionalRequirements: '' });
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [notice, setNotice] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const updateField = (event) => {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -45,7 +47,38 @@ export default function ProjectCreationWizard({ onBack }) {
     setAttachments((current) => [...current, ...Array.from(event.target.files || [])].slice(0, 5));
     event.target.value = '';
   };
-  const saveNotice = (action) => setNotice(`${action} will be available when project storage is connected. Your details remain in this form for now.`);
+  const saveProject = async (status) => {
+    setIsSaving(true);
+    setNotice('');
+    const payload = new FormData();
+    Object.entries({
+      title: form.title,
+      category: form.category,
+      description: form.description,
+      budget: form.budget,
+      duration: form.duration,
+      workArrangement: form.workArrangement,
+      expertsNeeded: form.expertsNeeded,
+      preferredDate: form.preferredDate,
+      experience: form.experience,
+      additionalRequirements: form.additionalRequirements,
+      status,
+    }).forEach(([key, value]) => {
+      if (value) payload.append(key, value);
+    });
+    skills.forEach((skill) => payload.append('skills[]', skill));
+    attachments.forEach((file) => payload.append('attachments[]', file));
+
+    try {
+      const { data } = await projectApi.create(payload);
+      onSaved(data.data);
+    } catch (error) {
+      const validationErrors = error.response?.data?.errors;
+      setNotice(validationErrors ? Object.values(validationErrors).flat()[0] : error.response?.data?.message || 'We couldn’t save this project. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const Choice = ({ name, value, label, checked, onChange }) => (
     <label className={`project-choice ${checked ? 'project-choice--selected' : ''}`}>
@@ -114,9 +147,9 @@ export default function ProjectCreationWizard({ onBack }) {
 
           {notice && <p className="project-wizard__notice" role="status">{notice}</p>}
           <div className="project-wizard__footer">
-            {step > 1 ? <button className="project-wizard__secondary" onClick={() => { setNotice(''); setStep((current) => current - 1); }} type="button"><ArrowLeft size={15} /> Previous</button> : <button className="project-wizard__secondary" onClick={() => saveNotice('Draft saving')} type="button">Save as Draft</button>}
+            {step > 1 ? <button className="project-wizard__secondary" disabled={isSaving} onClick={() => { setNotice(''); setStep((current) => current - 1); }} type="button"><ArrowLeft size={15} /> Previous</button> : <button className="project-wizard__secondary" disabled={isSaving} onClick={() => saveProject('draft')} type="button">Save as Draft</button>}
             <span className="project-wizard__footer-spacer" />
-            {step < 3 ? <button className="project-wizard__primary" onClick={nextStep} type="button">Next Step <ArrowRight size={15} /></button> : <><button className="project-wizard__secondary" onClick={() => saveNotice('Draft saving')} type="button">Save as Draft</button><button className="project-wizard__primary" onClick={() => saveNotice('Publishing')} type="button">Publish Project <ArrowRight size={15} /></button></>}
+            {step < 3 ? <button className="project-wizard__primary" onClick={nextStep} type="button">Next Step <ArrowRight size={15} /></button> : <><button className="project-wizard__secondary" disabled={isSaving} onClick={() => saveProject('draft')} type="button">Save as Draft</button><button className="project-wizard__primary" disabled={isSaving} onClick={() => saveProject('published')} type="button">{isSaving ? 'Saving…' : 'Publish Project'} <ArrowRight size={15} /></button></>}
           </div>
         </div>
 

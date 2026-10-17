@@ -51,27 +51,12 @@ const portals = [
   },
 ];
 
-function BrandMark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <span className="brand-mark__leaf brand-mark__leaf--one" />
-      <span className="brand-mark__leaf brand-mark__leaf--two" />
-      <span className="brand-mark__leaf brand-mark__leaf--three" />
-      <span className="brand-mark__leaf brand-mark__leaf--four" />
-    </span>
-  );
-}
-
 export default function RoleSelection({ onSelectRole, onCreateAccount }) {
   return (
     <main className="role-page">
       <header className="role-header">
         <a className="role-brand" href="#home" aria-label="ElderExpert home">
-          <BrandMark />
-          <span className="role-brand__text">
-            <span className="role-brand__name">ElderExpert</span>
-            <span className="role-brand__tagline">CONNECT&nbsp; • &nbsp;COLLABORATE&nbsp; • &nbsp;GROW</span>
-          </span>
+          <span className="role-brand__text"><strong className="role-brand__name">ElderExpert</strong><span className="role-brand__tagline">CONNECT · COLLABORATE · GROW</span></span>
         </a>
 
         <div className="role-signin">

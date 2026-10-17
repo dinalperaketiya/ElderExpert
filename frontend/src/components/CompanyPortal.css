@@ -1408,3 +1408,10 @@
   .cp-dashboard-stats .cp-stat-icon { width: 31px; height: 31px; }
   .cp-dashboard-stats .cp-stat-value { font-size: 20px; }
 }
+.cp-dashboard-project-list { display: grid; gap: 0; }
+.cp-dashboard-project-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 3px; border: 0; border-bottom: 1px solid #edf0eb; background: transparent; color: var(--forest-dark); text-align: left; cursor: pointer; }
+.cp-dashboard-project-row:last-child { border-bottom: 0; }
+.cp-dashboard-project-row strong,.cp-dashboard-project-row small { display: block; }
+.cp-dashboard-project-row strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.cp-dashboard-project-row small { margin-top: 4px; color: var(--slate-500); font-size: 11px; text-transform: capitalize; }
+.cp-dashboard-project-row>svg { flex: 0 0 auto; color: var(--forest); }

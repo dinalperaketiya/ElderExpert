@@ -29,6 +29,26 @@ export default function App() {
   const [isCheckingSession, setIsCheckingSession] = useState(() => Boolean(getAuthToken()));
   const [selectedExpert, setSelectedExpert] = useState(null);
 
+  const navigateTo = (view, { replace = false } = {}) => {
+    const state = { ...(window.history.state || {}), elderExpertView: view };
+    if (replace) window.history.replaceState(state, '');
+    else window.history.pushState(state, '');
+    setCurrentView(view);
+  };
+
+  useEffect(() => {
+    if (!window.history.state?.elderExpertView) {
+      window.history.replaceState({ ...(window.history.state || {}), elderExpertView: 'home' }, '');
+    }
+    const handlePopState = (event) => {
+      setCurrentView(event.state?.elderExpertView || 'home');
+      setSelectedExpert(null);
+      setAuthError('');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const showUserPortal = async (user) => {
     setAuthUser(user);
     setSelectedRole(null);
@@ -38,11 +58,11 @@ export default function App() {
       try {
         const { data } = await companyProfileApi.mine();
         setCompanyProfile(data.data);
-        setCurrentView(data.data ? 'company' : 'company-setup');
+        navigateTo(data.data ? 'company' : 'company-setup', { replace: true });
       } catch {
         setAuthMode('login');
         setAuthError('We couldn’t load your company profile. Please sign in again.');
-        setCurrentView('auth');
+        navigateTo('auth', { replace: true });
       }
       return;
     }
@@ -51,11 +71,11 @@ export default function App() {
       try {
         const { data } = await expertProfileApi.mine();
         setExpertProfile(data.data);
-        setCurrentView(data.data ? 'expert' : 'expert-setup');
+        navigateTo(data.data ? 'expert' : 'expert-setup', { replace: true });
       } catch {
         setAuthMode('login');
         setAuthError('We couldn’t load your expert profile. Please sign in again.');
-        setCurrentView('auth');
+        navigateTo('auth', { replace: true });
       }
       return;
     }
@@ -64,17 +84,17 @@ export default function App() {
       try {
         const { data } = await youngProfessionalProfileApi.mine();
         setYoungProfessionalProfile(data.data);
-        setCurrentView(data.data ? 'young-professional' : 'young-professional-setup');
+        navigateTo(data.data ? 'young-professional' : 'young-professional-setup', { replace: true });
       } catch {
         setAuthMode('login');
         setAuthError('We couldn’t load your profile. Please sign in again.');
-        setCurrentView('auth');
+        navigateTo('auth', { replace: true });
       }
       return;
     }
 
     setCompanyProfile(null);
-    setCurrentView(portalForRole(user.role));
+    navigateTo(portalForRole(user.role), { replace: true });
   };
 
   useEffect(() => {
@@ -93,7 +113,7 @@ export default function App() {
         } else {
           setAuthMode('login');
           setAuthError('We couldn’t reconnect to your account. Please sign in again.');
-          setCurrentView('auth');
+          navigateTo('auth', { replace: true });
         }
       })
       .finally(() => {
@@ -107,14 +127,14 @@ export default function App() {
     setSelectedRole(role);
     setAuthMode('login');
     setAuthError('');
-    setCurrentView('auth');
+    navigateTo('auth');
   };
 
   const handleCreateAccount = () => {
     setSelectedRole(null);
     setAuthMode('register');
     setAuthError('');
-    setCurrentView('auth');
+    navigateTo('auth');
   };
 
   const handleAuthSuccess = (user) => {
@@ -123,21 +143,21 @@ export default function App() {
 
   const handleCompanyProfileComplete = (profile) => {
     setCompanyProfile(profile);
-    setCurrentView('company');
+    navigateTo('company');
   };
 
   const handleExpertProfileComplete = (profile) => {
     setExpertProfile(profile);
-    setCurrentView('expert');
+    navigateTo('expert');
   };
 
   const handleYoungProfessionalProfileComplete = (profile) => {
     setYoungProfessionalProfile(profile);
-    setCurrentView('young-professional');
+    navigateTo('young-professional');
   };
 
   const handleReturnHome = () => {
-    setCurrentView('home');
+    navigateTo('home');
     setSelectedExpert(null);
     setSelectedRole(null);
     setAuthError('');
@@ -164,7 +184,7 @@ export default function App() {
     setYoungProfessionalProfile(null);
     setSelectedExpert(null);
     setSelectedRole(null);
-    setCurrentView('home');
+    navigateTo('home');
   };
 
   if (isCheckingSession) {
@@ -204,7 +224,7 @@ export default function App() {
       )}
 
       {currentView === 'expert' && (
-        <ExpertPortal onReturnHome={handleReturnHome} onLogout={handleLogout} onEditProfile={() => setCurrentView('expert-setup')} user={authUser} profile={expertProfile} />
+        <ExpertPortal onReturnHome={handleReturnHome} onLogout={handleLogout} onEditProfile={() => navigateTo('expert-setup')} user={authUser} profile={expertProfile} />
       )}
 
       {currentView === 'expert-setup' && (
@@ -212,7 +232,7 @@ export default function App() {
       )}
 
       {currentView === 'young-professional' && (
-        <YoungProfessionalPortal user={authUser} profile={youngProfessionalProfile} onEditProfile={() => setCurrentView('young-professional-setup')} onLogout={handleLogout} onReturnHome={handleReturnHome} />
+        <YoungProfessionalPortal user={authUser} profile={youngProfessionalProfile} onEditProfile={() => navigateTo('young-professional-setup')} onLogout={handleLogout} onReturnHome={handleReturnHome} />
       )}
 
       {currentView === 'young-professional-setup' && (
