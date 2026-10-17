@@ -40,6 +40,15 @@ export const companyProfileApi = {
   create: (profile) => api.post('/companies', profile),
 };
 
+export const projectApi = {
+  mine: () => api.get('/projects'),
+  browse: () => api.get('/projects'),
+  create: (project) => api.post('/projects', project, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
+  delete: (id) => api.delete(`/projects/${id}`),
+  applicationsMine: () => api.get('/applications/me'),
+  apply: (id, application) => api.post(`/projects/${id}/applications`, application, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
+};
+
 export const expertProfileApi = {
   mine: () => api.get('/experts/me'),
   create: (profile) => api.post('/experts', profile, { headers: { 'Content-Type': 'multipart/form-data' } }),

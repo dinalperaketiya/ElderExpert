@@ -79,7 +79,6 @@ export default function AuthScreen({ role, onRoleChange, mode, onModeChange, onB
           <ArrowLeft size={17} /> Back to role selection
         </button>
         <a className="auth-wordmark" href="#home" onClick={(event) => { event.preventDefault(); onBack(); }}>
-          <span className="auth-wordmark__mark">E</span>
           <span>ElderExpert</span>
         </a>
       </div>

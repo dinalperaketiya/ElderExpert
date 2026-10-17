@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowRight, Award, Bell, Bookmark, BriefcaseBusiness, CalendarDays, ChevronDown, CircleUserRound, FileText, GraduationCap, HelpCircle, Home, MapPin, MessageCircle, Search, Settings, Sparkles, UserRound, Users } from 'lucide-react';
 import './YoungProfessionalPortal.css';
+import './ProfilePhotoCrop.css';
+import './BrandLogo.css';
 
 const navigation = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
@@ -26,7 +28,7 @@ export default function YoungProfessionalPortal({ user, profile, onEditProfile, 
   return (
     <div className="yp-root">
       <aside className="yp-sidebar">
-        <button className="yp-brand" onClick={onReturnHome} type="button"><span className="yp-brand__mark">✦</span><span><b>ElderExpert</b><small>YOUNG PROFESSIONAL PORTAL</small></span></button>
+        <button className="yp-brand" onClick={onReturnHome} type="button" aria-label="ElderExpert home"><span className="yp-brand__copy"><b>ElderExpert</b><small>YOUNG PROFESSIONAL</small></span></button>
         <nav className="yp-nav" aria-label="Young professional portal">{navigation.map(({ id, label, icon: Icon }) => <button className={`yp-nav__item ${activeTab === id ? 'is-active' : ''}`} key={id} onClick={() => setActiveTab(id)} type="button"><Icon size={18}/><span>{label}</span></button>)}</nav>
         <section className="yp-help"><span><HelpCircle size={17}/></span><b>Need help?</b><p>Our community support team is happy to help.</p><button onClick={() => setActiveTab('messages')} type="button">Contact support <ArrowRight size={14}/></button></section>
         <button className="yp-sidebar__user" onClick={() => setActiveTab('profile')} type="button"><span className="yp-avatar yp-avatar--small">{avatar}</span><span><b>{name}</b><small>Young professional</small></span><ChevronDown size={15}/></button>

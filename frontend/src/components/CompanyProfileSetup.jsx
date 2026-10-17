@@ -46,7 +46,6 @@ export default function CompanyProfileSetup({ user, onComplete, onLogout }) {
     <main className="auth-page company-setup-page">
       <div className="auth-topbar">
         <a className="auth-wordmark" href="#home" onClick={(event) => event.preventDefault()}>
-          <span className="auth-wordmark__mark">E</span>
           <span>ElderExpert</span>
         </a>
         <button className="company-setup-signout" onClick={onLogout} type="button">Sign out</button>

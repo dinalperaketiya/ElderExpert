@@ -16,6 +16,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectApplicationController;
 
 
 // ==========================================
@@ -68,6 +70,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/companies', [CompanyProfileController::class, 'store']);
     Route::put('/companies/{id}', [CompanyProfileController::class, 'update']);
     Route::delete('/companies/{id}', [CompanyProfileController::class, 'destroy']);
+
+    // COMPANY PROJECTS
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+    Route::get('/applications/me', [ProjectApplicationController::class, 'mine']);
+    Route::post('/projects/{project}/applications', [ProjectApplicationController::class, 'store']);
 
 
     // ======================================

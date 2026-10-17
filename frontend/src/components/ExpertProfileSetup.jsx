@@ -3,6 +3,8 @@ import { ArrowRight, BriefcaseBusiness, Camera, MapPin, Sparkles, Upload, X } fr
 import { expertProfileApi } from '../services/api';
 import './ExpertProfileSetup.css';
 import './ExpertProfileSetupUpload.css';
+import './ProfilePhotoCrop.css';
+import './BrandLogo.css';
 
 export default function ExpertProfileSetup({ profile, onComplete, onLogout }) {
   const [form, setForm] = useState(() => ({ professional_title: profile?.professional_title || '', bio: profile?.bio || '', years_of_experience: profile?.years_of_experience ?? '', location: profile?.location || '' }));
@@ -41,7 +43,7 @@ export default function ExpertProfileSetup({ profile, onComplete, onLogout }) {
 
   return (
     <main className="expert-setup">
-      <header className="expert-setup__top"><a className="expert-setup__brand" href="#expert-profile"><span>✦</span><b>ElderExpert</b><small>EXPERT PORTAL</small></a><button type="button" onClick={onLogout}>Sign out</button></header>
+      <header className="expert-setup__top"><a className="expert-setup__brand" href="#expert-profile" aria-label="ElderExpert">ElderExpert</a><button type="button" onClick={onLogout}>Sign out</button></header>
       <section className="expert-setup__card">
         <div className="expert-setup__intro"><span className="expert-setup__eyebrow"><Sparkles size={14}/> YOUR EXPERIENCE MATTERS</span><h1>{profile ? 'Update your expert profile' : 'Create your expert profile'}</h1><p>Share your background so organizations can understand how you can help. You can update these details anytime.</p></div>
         <form onSubmit={submit} className="expert-setup__form">

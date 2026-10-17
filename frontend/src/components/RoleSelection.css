@@ -272,10 +272,6 @@
   .role-page { padding: 18px 20px 22px; }
   .role-page::before { left: -165px; top: 170px; }
   .role-page::after { width: 320px; right: -100px; bottom: -180px; }
-  .brand-mark { width: 47px; height: 47px; flex-basis: 47px; transform: scale(.82); transform-origin: left center; }
-  .role-brand { gap: 4px; }
-  .role-brand__name { font-size: 26px; }
-  .role-brand__tagline { font-size: 7px; letter-spacing: .7px; }
   .role-signin { gap: 8px; font-size: 11px; }
   .role-signin__button { min-height: 42px; padding: 0 12px; font-size: 12px; }
   .role-intro { margin: 38px auto 22px; }
