@@ -1,24 +1,22 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\TestController;
-use App\Http\Controllers\ExpertProfileController;
-use App\Http\Controllers\CompanyProfileController;
-use App\Http\Controllers\YoungProfessionalProfileController;
-use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CompanyProfileController;
+use App\Http\Controllers\ExpertMatchController;
+use App\Http\Controllers\ExpertProfileController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProjectApplicationController;
-
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\YoungProfessionalProfileController;
+use Illuminate\Support\Facades\Route;
 
 // ==========================================
 // PUBLIC ROUTES
@@ -35,7 +33,6 @@ Route::get('/expert-profile-photos/{filename}', [ExpertProfileController::class,
 Route::get('/young-professional-profile-photos/{filename}', [YoungProfessionalProfileController::class, 'photo'])
     ->where('filename', '[A-Za-z0-9._-]+');
 
-
 // ==========================================
 // PROTECTED ROUTES
 // ==========================================
@@ -46,7 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-
     // ======================================
     // EXPERTS
     // ======================================
@@ -54,11 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/experts/me', [ExpertProfileController::class, 'mine'])->middleware('role:expert');
     Route::get('/experts', [ExpertProfileController::class, 'index']);
     Route::get('/experts/{id}', [ExpertProfileController::class, 'show'])
-        ->middleware('role:expert,admin');;
+        ->middleware('role:expert,admin');
     Route::post('/experts', [ExpertProfileController::class, 'store']);
     Route::put('/experts/{id}', [ExpertProfileController::class, 'update']);
     Route::delete('/experts/{id}', [ExpertProfileController::class, 'destroy']);
-
 
     // ======================================
     // COMPANIES
@@ -72,12 +67,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/companies/{id}', [CompanyProfileController::class, 'destroy']);
 
     // COMPANY PROJECTS
+    Route::post('/expert-matches', ExpertMatchController::class)->middleware(['role:company', 'throttle:10,1']);
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::post('/projects', [ProjectController::class, 'store']);
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
     Route::get('/applications/me', [ProjectApplicationController::class, 'mine']);
     Route::post('/projects/{project}/applications', [ProjectApplicationController::class, 'store']);
-
 
     // ======================================
     // YOUNG PROFESSIONALS
@@ -90,7 +85,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'update']);
     Route::delete('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'destroy']);
 
-
     // ======================================
     // SERVICES
     // ======================================
@@ -100,7 +94,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
-
 
     // ======================================
     // AVAILABILITY
@@ -112,7 +105,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/availability/{id}', [AvailabilityController::class, 'update']);
     Route::delete('/availability/{id}', [AvailabilityController::class, 'destroy']);
 
-
     // ======================================
     // BOOKINGS
     // ======================================
@@ -122,7 +114,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::put('/bookings/{id}', [BookingController::class, 'update']);
     Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);
-
 
     // ======================================
     // PAYMENTS
@@ -134,7 +125,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/payments/{id}', [PaymentController::class, 'update']);
     Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
 
-
     // ======================================
     // REVIEWS
     // ======================================
@@ -144,7 +134,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
-
 
     // ======================================
     // MESSAGES
@@ -156,7 +145,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/messages/{id}', [MessageController::class, 'update']);
     Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
 
-
     // ======================================
     // NOTIFICATIONS
     // ======================================
@@ -166,7 +154,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications', [NotificationController::class, 'store']);
     Route::put('/notifications/{id}', [NotificationController::class, 'update']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
-
 
     // ======================================
     // USERS
