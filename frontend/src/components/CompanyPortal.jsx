@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ProjectCreationWizard from './ProjectCreationWizard';
+import ExpertMatchPanel from './ExpertMatchPanel';
 import { projectApi } from '../services/api';
 import {
   LayoutDashboard, Search, Briefcase, Calendar, MessageSquare,
@@ -30,7 +31,34 @@ const DEMO_STATS = [
 const DEMO_BOOKINGS = [];
 const DEMO_MESSAGES = [];
 const DEMO_REVIEWS = [];
-const initialExperts = [];
+
+function mapExpertProfile(profile) {
+  const services = profile.services || [];
+  const firstPricedService = services.find((service) => service.price !== null && service.price !== undefined);
+  const servicePrice = firstPricedService
+    ? `LKR ${Number(firstPricedService.price).toLocaleString('en-LK')}${firstPricedService.duration ? ` / ${firstPricedService.duration}` : ''}`
+    : 'Rate on request';
+
+  return {
+    id: profile.id,
+    name: profile.user?.name || profile.professional_title || 'Verified expert',
+    initials: (profile.user?.name || profile.professional_title || 'EX').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase(),
+    avatar: profile.profile_photo || '',
+    title: profile.professional_title || 'Experienced professional',
+    experienceYears: Number(profile.years_of_experience || 0),
+    domain: services[0]?.title || profile.professional_title || 'Professional services',
+    skills: services.map((service) => service.title).filter(Boolean),
+    rateLabel: servicePrice,
+    rating: profile.reviews_avg_rating ? Number(profile.reviews_avg_rating) : null,
+    reviewsCount: Number(profile.reviews_count || 0),
+    verified: Boolean(profile.is_verified),
+    availability: profile.availability?.length ? 'Availability listed' : 'Contact for availability',
+    bio: profile.bio || 'This expert has not added a biography yet.',
+    location: profile.location || '',
+    matchScore: profile.match_score,
+    matchReasons: profile.match_reasons || [],
+  };
+}
 
 // ─── Reusable sub-components ──────────────────────────────────────────────────
 
@@ -83,12 +111,14 @@ function ExpertCard({ expert, isSaved, onSave, onView, onBook, compact = false }
   return (
     <div className={`cp-expert-card ${compact ? 'cp-expert-card--compact' : ''}`}>
       <div className="cp-expert-card__header">
-        <img
-          src={expert.avatar}
-          alt={expert.name}
-          className="cp-expert-card__avatar"
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-        />
+        {expert.avatar ? (
+          <img
+            src={expert.avatar}
+            alt={expert.name}
+            className="cp-expert-card__avatar"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : <span className="cp-expert-card__avatar-fallback">{expert.initials}</span>}
         <div className="cp-expert-card__info">
           <div className="cp-expert-card__name-row">
             <span className="cp-expert-card__name">{expert.name}</span>
@@ -97,11 +127,11 @@ function ExpertCard({ expert, isSaved, onSave, onView, onBook, compact = false }
             )}
           </div>
           <span className="cp-expert-card__title">{expert.title}</span>
-          <span className="cp-expert-card__meta">{expert.formerCompany} · {expert.experienceYears} yrs</span>
+          <span className="cp-expert-card__meta">{expert.experienceYears} years of experience</span>
         </div>
 
         <div className="cp-expert-card__actions">
-          <span className="cp-expert-card__rate">${expert.hourlyRate}/hr</span>
+          <span className="cp-expert-card__rate">{expert.rateLabel || 'Rate on request'}</span>
           <div className="cp-expert-card__btns">
             <button
               className={`cp-icon-btn ${isSaved ? 'cp-icon-btn--saved' : ''}`}
@@ -126,16 +156,22 @@ function ExpertCard({ expert, isSaved, onSave, onView, onBook, compact = false }
       {!compact && (
         <>
           <p className="cp-expert-card__bio">{expert.bio}</p>
+          {expert.matchScore !== undefined && (
+            <div className="cp-expert-match-summary">
+              <strong>{expert.matchScore}% match</strong>
+              {expert.matchReasons?.map((reason) => <span key={reason}>{reason}</span>)}
+            </div>
+          )}
           <div className="cp-expert-card__skills">
             {expert.skills.map((s, i) => (
               <span key={i} className="cp-skill-tag">{s}</span>
             ))}
           </div>
           <div className="cp-expert-card__footer">
-            <span className="cp-expert-card__rating">
+            {expert.rating !== null ? <span className="cp-expert-card__rating">
               <Star size={13} fill="#D97706" color="#D97706" />
-              {expert.rating} ({expert.reviewsCount} reviews)
-            </span>
+              {expert.rating.toFixed(1)} ({expert.reviewsCount} reviews)
+            </span> : <span className="cp-expert-card__rating">No reviews yet</span>}
             <span className="cp-expert-card__avail">
               <Clock size={13} />
               {expert.availability}
@@ -263,12 +299,13 @@ function ViewOverview({ onNav, companyProfile }) {
 
 // ─── View: Find Experts ───────────────────────────────────────────────────────
 
-function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
+function ViewFindExperts({ onMatchResults, savedExperts, onSave, onView, onBook }) {
   const [search, setSearch]         = useState('');
   const [domain, setDomain]         = useState('All');
   const [minRating, setMinRating]   = useState(0);
   const [sortBy, setSortBy]         = useState('rating');
   const [showFilters, setShowFilters] = useState(false);
+  const [hasRecommendations, setHasRecommendations] = useState(false);
 
   const domains = ['All', 'Technology & Hardware', 'Finance & M&A', 'Operations & Supply Chain', 'Life Sciences & Healthcare', 'Business Strategy & Governance', 'Legal & Regulatory'];
   const sortOptions = [
@@ -297,11 +334,23 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
   return (
     <div className="cp-view cp-view--catalog">
       <CatalogHeading eyebrow="EXPERT DIRECTORY" title="Find Experts" description="Explore verified professionals by skills, experience, and focus area." />
-      <div className="cp-project-stats">
+      <ExpertMatchPanel
+        onResultsChange={(profiles) => {
+          setHasRecommendations(profiles.length > 0);
+          if (profiles.length > 0) {
+            onMatchResults(profiles.map(mapExpertProfile));
+          }
+        }}
+        renderExpert={(profile) => {
+          const expert = mapExpertProfile(profile);
+          return <ExpertCard key={expert.id} expert={expert} isSaved={savedExperts.includes(expert.id)} onSave={onSave} onView={onView} onBook={onBook} />;
+        }}
+      />
+      {!hasRecommendations && <div className="cp-project-stats">
         <CatalogStat icon={Users} value={initialExperts.length} label="Expert Profiles" />
         <CatalogStat icon={CircleCheck} value={initialExperts.length} label="Verified Experts" tone="completed" />
-        <CatalogStat icon={Bookmark} value={0} label="Saved Experts" tone="draft" />
-      </div>
+        <CatalogStat icon={Bookmark} value={savedExperts.length} label="Saved Experts" tone="draft" />
+      </div>}
 
       {/* Search & Sort bar */}
       <div className="cp-search-bar">
@@ -374,18 +423,18 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
       )}
 
       {/* Results */}
-      <div className="cp-results-meta">
+      {!hasRecommendations && <div className="cp-results-meta">
         {filtered.length} expert{filtered.length !== 1 ? 's' : ''} found
-      </div>
+      </div>}
 
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && !hasRecommendations ? (
         <section className="cp-project-empty cp-project-empty--catalog">
           <div className="cp-project-empty__leaf cp-project-empty__leaf--top"><Leaf size={82} /></div>
           <div className="cp-project-empty__art"><Search size={88} strokeWidth={1.3} /></div>
           <h2>{initialExperts.length === 0 ? 'Expert profiles are being prepared' : 'No experts match your search'}</h2>
           <p>{initialExperts.length === 0 ? 'We’ll show verified professional profiles here when real expert details are available.' : 'Try changing your search or filters to see more results.'}</p>
         </section>
-      ) : (
+      ) : filtered.length > 0 ? (
         <div className="cp-experts-list">
           {filtered.map(exp => (
             <ExpertCard
@@ -398,7 +447,7 @@ function ViewFindExperts({ savedExperts, onSave, onView, onBook }) {
             />
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -655,8 +704,8 @@ function ViewMessages() {
 
 // ─── View: Saved Experts ──────────────────────────────────────────────────────
 
-function ViewSavedExperts({ savedExperts, onSave, onView, onBook }) {
-  const saved = initialExperts.filter(e => savedExperts.includes(e.id));
+function ViewSavedExperts({ matchedExperts, savedExperts, onSave, onView, onBook }) {
+  const saved = matchedExperts.filter((expert) => savedExperts.includes(expert.id));
 
   return (
     <div className="cp-view cp-view--catalog">
@@ -893,10 +942,18 @@ const NAV_ITEMS = [
 export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout, companyProfile }) {
   const [activeNav,    setActiveNav]    = useState('overview');
   const [savedExperts, setSavedExperts] = useState([]);
+  const [matchedExperts, setMatchedExperts] = useState([]);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
   const toggleSave = useCallback((id) => {
     setSavedExperts(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  }, []);
+
+  const rememberMatches = useCallback((profiles) => {
+    setMatchedExperts((current) => [
+      ...current.filter((expert) => !profiles.some((profile) => profile.id === expert.id)),
+      ...profiles,
+    ]);
   }, []);
 
   const handleView = useCallback((expert) => {
@@ -913,7 +970,7 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout, 
   }, []);
 
   const renderView = () => {
-    const sharedProps = { savedExperts, onSave: toggleSave, onView: handleView, onBook: handleBook };
+    const sharedProps = { matchedExperts, onMatchResults: rememberMatches, savedExperts, onSave: toggleSave, onView: handleView, onBook: handleBook };
     switch (activeNav) {
       case 'overview':        return <ViewOverview       {...sharedProps} companyProfile={companyProfile} onNav={navTo} />;
       case 'find-experts':    return <ViewFindExperts    {...sharedProps} />;

@@ -5,6 +5,9 @@ import {
 
 export default function ExpertProfileModal({ expert, onClose }) {
   if (!expert) return null;
+  const matchReasons = expert.matchReasons || (expert.matchReason ? [expert.matchReason] : []);
+  const matchScore = expert.matchScore ?? expert.aiMatchScore;
+  const rateLabel = expert.rateLabel || (expert.hourlyRate ? `$${expert.hourlyRate}/hr` : 'Rate on request');
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
@@ -39,7 +42,7 @@ export default function ExpertProfileModal({ expert, onClose }) {
                 )}
               </div>
               <p className="epm-title">{expert.title}</p>
-              <p className="epm-company">{expert.formerCompany}</p>
+              <p className="epm-company">{expert.formerCompany || 'Verified ElderExpert professional'}</p>
               <div className="epm-meta-row">
                 {expert.rating && (
                   <span className="epm-meta">
@@ -72,7 +75,7 @@ export default function ExpertProfileModal({ expert, onClose }) {
           {/* Rate & Book */}
           <div className="epm-cta-banner">
             <div>
-              <span className="epm-rate">${expert.hourlyRate}<span>/hr</span></span>
+              <span className="epm-rate">{rateLabel}</span>
               <span className="epm-exp">{expert.experienceYears} years experience</span>
             </div>
             <button
@@ -117,15 +120,15 @@ export default function ExpertProfileModal({ expert, onClose }) {
           )}
 
           {/* AI Match (if present) */}
-          {expert.matchReason && (
+          {matchReasons.length > 0 && (
             <section className="epm-section">
               <h3 className="epm-section__title epm-section__title--ai">
-                Why ElderExpert Recommends This Advisor
-                {expert.aiMatchScore && (
-                  <span className="epm-match-score">{expert.aiMatchScore}% match</span>
+                Why this expert matched
+                {matchScore !== undefined && (
+                  <span className="epm-match-score">{matchScore}% match</span>
                 )}
               </h3>
-              <p className="epm-match-reason">{expert.matchReason}</p>
+              <p className="epm-match-reason">{matchReasons.join(' ')}</p>
             </section>
           )}
         </div>

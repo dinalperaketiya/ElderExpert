@@ -49,8 +49,13 @@ export const projectApi = {
   apply: (id, application) => api.post(`/projects/${id}/applications`, application, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
 };
 
+export const expertMatchApi = {
+  recommend: (payload) => api.post('/expert-matches', payload, { timeout: 25000 }),
+};
+
 export const expertProfileApi = {
   mine: () => api.get('/experts/me'),
+  directory: () => api.get('/experts'),
   create: (profile) => api.post('/experts', profile, { headers: { 'Content-Type': 'multipart/form-data' } }),
   update: (id, profile) => {
     profile.append('_method', 'PUT');
