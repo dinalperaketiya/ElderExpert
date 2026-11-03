@@ -1,0 +1,11 @@
+.ep-avatar img,
+.expert-setup__photo-icon img,
+.yp-avatar img,
+.yp-setup__photo-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: center 28%;
+}

@@ -1,410 +1,161 @@
-import React, { useState } from 'react';
-import { 
-  User, Briefcase, Calendar, MessageSquare, Star, FileText, CheckCircle2, 
-  Clock, ShieldCheck, ChevronRight, DollarSign, Bell, ArrowLeft, Send
-} from 'lucide-react';
-import { initialExpertOpportunities, initialConsultationRequests, initialKnowledgeArticles } from '../services/api';
+import React, { useEffect, useState } from 'react';
+import { Activity, ArrowRight, BarChart3, Bell, BriefcaseBusiness, CalendarDays, Check, ChevronDown, CircleUserRound, FileText, HelpCircle, Home, LogOut, MapPin, MessageCircle, Search, Send, Settings, ShieldCheck, Star, UserRound, Users } from 'lucide-react';
+import { projectApi } from '../services/api';
+import './ExpertPortal.css';
+import './ProfilePhotoCrop.css';
+import './BrandLogo.css';
 
-export default function ExpertPortal({ onReturnHome }) {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'opportunities', 'requests', 'articles', 'profile'
-  const [consultations, setConsultations] = useState(initialConsultationRequests);
-  const [isAvailable, setIsAvailable] = useState(true);
+const navItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'projects', label: 'Browse Projects', icon: BriefcaseBusiness },
+  { id: 'applications', label: 'My Applications', icon: Send },
+  { id: 'bookings', label: 'My Bookings', icon: CalendarDays },
+  { id: 'messages', label: 'Messages', icon: MessageCircle },
+  { id: 'profile', label: 'My Profile', icon: CircleUserRound },
+  { id: 'reviews', label: 'Reviews', icon: Star },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
 
-  const confirmRequest = (id) => {
-    setConsultations(consultations.map(c => c.id === id ? { ...c, status: 'Confirmed' } : c));
+export default function ExpertPortal({ onReturnHome, onLogout, onEditProfile, user, profile }) {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [search, setSearch] = useState('');
+  const [projects, setProjects] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [projectError, setProjectError] = useState('');
+  const [applicationProjectId, setApplicationProjectId] = useState(null);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [proposedBudget, setProposedBudget] = useState('');
+  const [submittingApplication, setSubmittingApplication] = useState(false);
+  const [applicationNotice, setApplicationNotice] = useState('');
+  const name = user?.name || profile?.user?.name || 'Expert';
+  const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+  const profileFields = [profile?.professional_title, profile?.bio, profile?.location, profile?.years_of_experience, profile?.profile_photo];
+  const completion = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
+  const avatar = profile?.profile_photo ? <img src={profile.profile_photo} alt="" /> : initials;
+
+  useEffect(() => {
+    if (activeTab === 'projects') {
+      Promise.all([projectApi.browse(), projectApi.applicationsMine()])
+        .then(([projectResponse, applicationResponse]) => {
+          setProjects(projectResponse.data.data || []);
+          setApplications(applicationResponse.data.data || []);
+        })
+        .catch((error) => setProjectError(error.response?.data?.message || 'Could not load available projects. Please try again.'))
+        .finally(() => setProjectsLoading(false));
+    }
+    if (activeTab === 'applications') {
+      projectApi.applicationsMine()
+        .then(({ data }) => setApplications(data.data || []))
+        .catch((error) => setProjectError(error.response?.data?.message || 'Could not load your applications. Please try again.'))
+        .finally(() => setApplicationsLoading(false));
+    }
+  }, [activeTab]);
+
+  const submitApplication = async (event, projectId) => {
+    event.preventDefault();
+    setSubmittingApplication(true);
+    setProjectError('');
+    setApplicationNotice('');
+    try {
+      const applicationData = new FormData();
+      applicationData.append('cover_letter', coverLetter);
+      applicationData.append('resume', resumeFile);
+      if (proposedBudget) applicationData.append('proposed_budget', proposedBudget);
+      const { data } = await projectApi.apply(projectId, applicationData);
+      setApplications((current) => [data.data, ...current]);
+      setProjects((current) => current.map((project) => project.id === projectId ? { ...project, has_applied: true } : project));
+      setApplicationProjectId(null);
+      setCoverLetter('');
+      setResumeFile(null);
+      setProposedBudget('');
+      setApplicationNotice(data.emails_sent === 2
+        ? 'Application sent successfully. Confirmation emails were sent to you and the company.'
+        : data.emails_sent === 1
+          ? 'Application sent successfully. One notification email could not be delivered.'
+          : 'Application sent successfully. Email delivery is not configured yet.');
+    } catch (error) {
+      setProjectError(error.response?.data?.errors?.cover_letter?.[0] || error.response?.data?.errors?.resume?.[0] || error.response?.data?.errors?.proposed_budget?.[0] || error.response?.data?.message || 'Could not submit your application. Please try again.');
+    } finally {
+      setSubmittingApplication(false);
+    }
   };
 
-  const navItems = [
-    { id: 'overview', label: 'Dashboard Overview', icon: User },
-    { id: 'opportunities', label: 'Recommended Projects', icon: Briefcase, badge: '3 New' },
-    { id: 'requests', label: 'Consultation Requests', icon: Calendar, badge: '2 Pending' },
-    { id: 'articles', label: 'My Articles & Wisdom', icon: FileText },
-    { id: 'profile', label: 'Profile & Credentials', icon: ShieldCheck },
-  ];
+  const visibleProjects = projects.filter((project) => {
+    const query = search.trim().toLowerCase();
+    if (!query) return true;
+    return [project.title, project.category, project.description, project.company_profile?.company_name, ...(project.required_skills || [])]
+      .some((value) => String(value || '').toLowerCase().includes(query));
+  });
+
+  const openProfile = () => { setActiveTab('profile'); onEditProfile?.(); };
+  const showEmpty = (title, description, icon = FileText) => {
+    const Icon = icon;
+    return <section className="expert-empty"><span><Icon size={25}/></span><h2>{title}</h2><p>{description}</p></section>;
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-[#334155] flex flex-col">
-      
-      {/* Portal Top Bar */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-xs">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onReturnHome}
-            className="p-2 rounded-xl text-slate-600 hover:text-[#123B5D] hover:bg-slate-100 flex items-center gap-1.5 text-sm font-semibold transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back to ElderExpert Home</span>
-          </button>
-          <div className="h-5 w-px bg-slate-300 hidden sm:block"></div>
-          <span className="text-sm font-bold text-[#123B5D] hidden sm:block">
-            Senior Advisor Workspace
-          </span>
-        </div>
+    <div className="ep-root">
+      <aside className="ep-sidebar">
+        <button className="ep-brand" onClick={onReturnHome} type="button" aria-label="ElderExpert home"><span className="ep-brand__copy"><b>ElderExpert</b><small>EXPERT PORTAL</small></span></button>
+        <nav className="ep-nav" aria-label="Expert portal">
+          {navItems.map(({ id, label, icon: Icon }) => <button className={`ep-nav__item ${activeTab === id ? 'is-active' : ''}`} key={id} onClick={() => { if (id !== activeTab) { setProjectError(''); if (id === 'projects') setProjectsLoading(true); if (id === 'applications') setApplicationsLoading(true); setActiveTab(id); } }} type="button"><Icon size={18}/><span>{label}</span></button>)}
+        </nav>
+        <div className="ep-help"><span className="ep-help__icon"><HelpCircle size={18}/></span><b>Need help?</b><p>Our team is here to support your expert journey.</p><button onClick={() => setActiveTab('messages')} type="button">Contact support <span>→</span></button></div>
+        <button className="ep-sidebar__user" onClick={() => setActiveTab('profile')} type="button"><span className="ep-avatar ep-avatar--small">{avatar}</span><span><b>{name}</b><small>Expert account</small></span><ChevronDown size={15}/></button>
+      </aside>
 
-        {/* Advisor Profile snippet & status toggle */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Advisory Status:</span>
-            <button
-              onClick={() => setIsAvailable(!isAvailable)}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
-                isAvailable ? 'bg-emerald-100 text-[#0F766E]' : 'bg-slate-200 text-slate-700'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-[#0F766E]' : 'bg-slate-500'}`}></span>
-              <span>{isAvailable ? 'Available for Consultations' : 'Temporarily Away'}</span>
-            </button>
-          </div>
+      <div className="ep-content">
+        <header className="ep-header">
+          <label className="ep-search"><Search size={17}/><input aria-label="Search your portal" onChange={(event) => setSearch(event.target.value)} placeholder="Search your portal…" value={search}/><kbd>⌘ K</kbd></label>
+          <div className="ep-header__actions"><button className="ep-icon-button" aria-label="Notifications" type="button"><Bell size={18}/><i/></button><button className="ep-account" onClick={() => setActiveTab('profile')} type="button"><span className="ep-avatar">{avatar}</span><span><b>{name}</b><small>Expert</small></span><ChevronDown size={15}/></button><button className="ep-logout" onClick={onLogout} type="button" title="Sign out"><LogOut size={16}/><span>Sign out</span></button></div>
+        </header>
 
-          <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-            <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150"
-              alt="Dr. Arthur Pendelton"
-              className="w-9 h-9 rounded-xl object-cover border border-slate-200"
-            />
-            <div className="hidden md:block text-left text-xs">
-              <span className="font-bold text-[#123B5D] block">Dr. Arthur Pendelton</span>
-              <span className="text-slate-500">VP Architecture (Retired)</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        <main className="ep-main">
+          {activeTab === 'dashboard' && <>
+            <section className="ep-welcome"><div className="ep-welcome__copy"><span className="ep-eyebrow">YOUR EXPERT WORKSPACE</span><h1>Welcome, {name.split(' ')[0]} <span>✦</span></h1><p>Share your experience, connect with organizations, and make a meaningful impact.</p><div className="ep-welcome__buttons"><button className="ep-button ep-button--primary" onClick={openProfile} type="button"><UserRound size={16}/> {completion < 100 ? 'Complete your profile' : 'Update your profile'} <span>→</span></button><button className="ep-button ep-button--light" onClick={() => setActiveTab('bookings')} type="button"><CalendarDays size={16}/> View bookings</button></div></div><div className="ep-welcome__art" aria-hidden="true"><div className="ep-art-orbit ep-art-orbit--one"/><div className="ep-art-orbit ep-art-orbit--two"/><span className="ep-art-leaf">✦</span><div className="ep-art-card"><ShieldCheck size={30}/><b>Experience<br/>that inspires</b></div></div><blockquote className="ep-quote">“Your knowledge can open doors for the next generation.”<span>— ElderExpert community</span></blockquote></section>
 
-      {/* Main Workspace Body */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Navigation Sidebar */}
-        <aside className="lg:col-span-3 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-xs space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-[#123B5D] text-white shadow-xs'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[#EAF4FF] text-[#2563EB]'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+            <section className="ep-stats" aria-label="Expert account summary">
+              <article className="ep-stat"><span className="ep-stat__icon ep-stat__icon--mint"><CalendarDays size={19}/></span><div><b>0</b><small>Upcoming bookings</small></div><span className="ep-stat__foot">Ready when you are</span></article>
+              <article className="ep-stat"><span className="ep-stat__icon ep-stat__icon--blue"><MessageCircle size={19}/></span><div><b>0</b><small>New messages</small></div><span className="ep-stat__foot">No unread messages</span></article>
+              <article className="ep-stat"><span className="ep-stat__icon ep-stat__icon--gold"><Star size={19}/></span><div><b>—</b><small>Expert rating</small></div><span className="ep-stat__foot">Build your track record</span></article>
+            </section>
 
-          {/* Quick Help for Seniors */}
-          <div className="p-5 bg-[#EAF4FF] rounded-2xl border border-blue-200 space-y-2">
-            <h4 className="text-sm font-bold text-[#123B5D]">Need Assistance?</h4>
-            <p className="text-xs text-[#334155] leading-relaxed">
-              Our advisor concierge team is available to assist you with scheduling or payment questions.
-            </p>
-            <div className="text-xs font-bold text-[#2563EB] pt-1">
-              📞 Call Concierge: 1-800-ELDER-HELP
-            </div>
-          </div>
-        </aside>
+            <section className="ep-overview-grid"><article className="ep-panel ep-profile-progress"><div className="ep-panel__heading"><div><span className="ep-eyebrow">MAKE A GREAT FIRST IMPRESSION</span><h2>Profile completion</h2></div><span className="ep-percent">{completion}%</span></div><div className="ep-progress"><span style={{ width: `${completion}%` }}/></div><p className="ep-panel__hint">A complete profile helps organizations understand your experience and expertise.</p><div className="ep-checklist">{[['Professional title', Boolean(profile?.professional_title)], ['Professional summary', Boolean(profile?.bio)], ['Location', Boolean(profile?.location)], ['Years of experience', Boolean(profile?.years_of_experience)]].map(([label, done]) => <div key={label} className={done ? 'is-done' : ''}><span>{done ? <Check size={13}/> : <i/>}</span>{label}</div>)}</div><button className="ep-panel__link" onClick={openProfile} type="button">{completion < 100 ? 'Finish your profile' : 'Review your profile'} <span>→</span></button></article>
 
-        {/* Right Main Content */}
-        <main className="lg:col-span-9 space-y-8">
-          
-          {/* TAB 1: OVERVIEW */}
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              
-              {/* Profile Completion Card */}
-              <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-[#0F766E]" />
-                    <h3 className="text-lg font-bold text-[#123B5D]">Profile 100% Verified</h3>
-                  </div>
-                  <p className="text-sm text-[#475569]">
-                    Your 42-year engineering credentials at Intel and AMD have been verified by our executive committee.
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-[#123B5D] bg-[#EAF4FF] px-4 py-2 rounded-xl">
-                    Advisory Rate: $180/hr
-                  </span>
-                </div>
-              </div>
+              <article className="ep-panel ep-next-steps"><div className="ep-panel__heading"><div><span className="ep-eyebrow">GET STARTED</span><h2>Your next steps</h2></div><Activity size={20}/></div><button className="ep-step" onClick={openProfile} type="button"><span className="ep-step__number">01</span><span><b>Polish your profile</b><small>Add the details that showcase your career.</small></span><span className="ep-step__arrow">→</span></button><button className="ep-step" onClick={() => setActiveTab('bookings')} type="button"><span className="ep-step__number">02</span><span><b>Set your availability</b><small>Let people know when you can connect.</small></span><span className="ep-step__arrow">→</span></button><button className="ep-step" onClick={() => setActiveTab('messages')} type="button"><span className="ep-step__number">03</span><span><b>Stay connected</b><small>Messages and booking requests will appear here.</small></span><span className="ep-step__arrow">→</span></button></article></section>
 
-              {/* High-Level Senior Summary Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase">Total Advisory Earnings</span>
-                  <div className="text-3xl font-bold text-[#123B5D]">$4,860</div>
-                  <span className="text-xs font-medium text-[#0F766E]">Direct deposit active</span>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase">Consultations Completed</span>
-                  <div className="text-3xl font-bold text-[#2563EB]">27 Sessions</div>
-                  <span className="text-xs font-medium text-slate-500">100% positive feedback</span>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase">Client Rating</span>
-                  <div className="text-3xl font-bold text-amber-600 flex items-center gap-1">
-                    <Star className="w-7 h-7 fill-amber-500 text-amber-500" />
-                    <span>4.98</span>
-                  </div>
-                  <span className="text-xs font-medium text-slate-500">86 verified client reviews</span>
-                </div>
-              </div>
-
-              {/* Pending Requests Preview */}
-              <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h3 className="text-lg font-bold text-[#123B5D]">Recent Consultation Inquiries</h3>
-                  <button
-                    onClick={() => setActiveTab('requests')}
-                    className="text-xs font-bold text-[#2563EB] hover:underline"
-                  >
-                    View All
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {consultations.map((req) => (
-                    <div
-                      key={req.id}
-                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-base font-bold text-[#123B5D]">{req.clientName}</h4>
-                          <span className="text-xs text-slate-500">({req.company})</span>
-                        </div>
-                        <p className="text-sm text-[#334155] font-medium">{req.topic}</p>
-                        <p className="text-xs text-slate-500">Requested: {req.requestedDate} • Fee: {req.fee}</p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {req.status === 'Confirmed' ? (
-                          <span className="px-3 py-1.5 rounded-lg bg-emerald-100 text-[#0F766E] text-xs font-bold">
-                            ✓ Confirmed & Calendar Synced
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => confirmRequest(req.id)}
-                            className="px-4 py-2 rounded-xl text-sm font-bold bg-[#2563EB] hover:bg-blue-700 text-white shadow-xs"
-                          >
-                            Accept Session
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* TAB 2: RECOMMENDED PROJECTS */}
-          {activeTab === 'opportunities' && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-2xl font-bold text-[#123B5D]">Consulting & Advisory Opportunities</h3>
-                <p className="text-sm text-[#475569] mt-1">
-                  Projects specifically matching your VLSI, microprocessor architecture, and hardware validation experience.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {initialExpertOpportunities.map((opp) => (
-                  <div
-                    key={opp.id}
-                    className="bg-white p-7 rounded-2xl border border-slate-200 shadow-xs space-y-4"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                      <div>
-                        <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">{opp.domain}</span>
-                        <h4 className="text-xl font-bold text-[#123B5D] mt-0.5">{opp.title}</h4>
-                        <p className="text-sm font-semibold text-slate-600 mt-1">{opp.client} • Duration: {opp.duration}</p>
-                      </div>
-                      <div className="sm:text-right">
-                        <span className="text-2xl font-bold text-[#123B5D] block">{opp.budget}</span>
-                        <span className="text-xs font-bold text-[#0F766E] bg-emerald-50 px-2 py-0.5 rounded-md">
-                          {opp.matchScore}% Match Score
-                        </span>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-[#334155] leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-                      "{opp.description}"
-                    </p>
-
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-xs text-slate-500 font-medium">Criterion: {opp.requiredExp}</span>
-                      <button
-                        onClick={() => alert(`Proposal submitted for: ${opp.title}`)}
-                        className="px-5 py-2.5 rounded-xl text-sm font-bold bg-[#123B5D] hover:bg-[#2563EB] text-white shadow-xs transition-colors"
-                      >
-                        Submit Proposal
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: CONSULTATION REQUESTS */}
-          {activeTab === 'requests' && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-2xl font-bold text-[#123B5D]">Your Consultation Schedule</h3>
-                <p className="text-sm text-[#475569] mt-1">
-                  Manage upcoming 1-on-1 advisory appointments and review pending client inquiries.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {consultations.map((req) => (
-                  <div key={req.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs font-bold text-slate-500 uppercase">Consultation #{req.id}</span>
-                        <h4 className="text-lg font-bold text-[#123B5D]">{req.topic}</h4>
-                        <p className="text-sm text-[#334155] font-semibold mt-0.5">With: {req.clientName} ({req.company})</p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        req.status === 'Confirmed' ? 'bg-emerald-100 text-[#0F766E]' : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {req.status}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm text-[#475569] pt-2 border-t border-slate-100">
-                      <div>
-                        <span className="text-xs font-semibold text-slate-400 block">Date & Time</span>
-                        <span className="font-bold text-slate-800">{req.requestedDate}</span>
-                      </div>
-                      <div>
-                        <span className="text-xs font-semibold text-slate-400 block">Duration</span>
-                        <span className="font-bold text-slate-800">{req.duration}</span>
-                      </div>
-                      <div>
-                        <span className="text-xs font-semibold text-slate-400 block">Advisory Fee</span>
-                        <span className="font-bold text-[#123B5D]">{req.fee}</span>
-                      </div>
-                    </div>
-
-                    {req.status === 'Confirmed' ? (
-                      <div className="p-3 bg-blue-50 rounded-xl text-xs font-bold text-[#2563EB] flex items-center justify-between">
-                        <span>Video Room Link: https://meet.elderexpert.com/room-{req.id}</span>
-                        <button className="underline">Copy Link</button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => confirmRequest(req.id)}
-                        className="w-full py-3 rounded-xl text-sm font-bold bg-[#2563EB] text-white"
-                      >
-                        Confirm Appointment
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: ARTICLES */}
-          {activeTab === 'articles' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-[#123B5D]">Published Knowledge & Wisdom</h3>
-                  <p className="text-sm text-[#475569] mt-1">Share playbooks and guides to mentor the next generation.</p>
-                </div>
-                <button
-                  onClick={() => alert('New article draft created.')}
-                  className="px-4 py-2 rounded-xl text-sm font-bold bg-[#2563EB] text-white shadow-xs"
-                >
-                  + Write New Article
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {initialKnowledgeArticles.slice(0, 1).map((art) => (
-                  <div key={art.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-                    <span className="text-xs font-bold text-[#2563EB]">{art.category}</span>
-                    <h4 className="text-lg font-bold text-[#123B5D]">{art.title}</h4>
-                    <p className="text-sm text-[#475569] leading-relaxed">{art.summary}</p>
-                    <div className="text-xs text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
-                      <span>Status: Published on Knowledge Hub</span>
-                      <span className="font-bold text-slate-800">1,420 Reads • 18 Citations</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 5: PROFILE */}
-          {activeTab === 'profile' && (
-            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-              <div>
-                <h3 className="text-2xl font-bold text-[#123B5D]">My Senior Advisor Profile</h3>
-                <p className="text-sm text-[#475569] mt-1">Review your executive history and public credentials.</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    defaultValue="Dr. Arthur Pendelton"
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base font-semibold text-[#123B5D]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Former Enterprise</label>
-                  <input
-                    type="text"
-                    defaultValue="Intel Corporation & AMD (Retired)"
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-base font-semibold text-[#123B5D]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Professional Career Summary</label>
-                <textarea
-                  rows={4}
-                  defaultValue="Spent over four decades designing high-performance computing hardware. Now guiding hardware startups through silicon validation, tape-out readiness, and manufacturing scalability."
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800 resize-none"
-                />
-              </div>
-
-              <button
-                onClick={() => alert('Profile credentials updated successfully.')}
-                className="px-6 py-3 rounded-xl text-base font-bold bg-[#123B5D] text-white hover:bg-[#2563EB] transition-colors"
-              >
-                Save Profile Updates
-              </button>
-            </div>
-          )}
-
+            <section className="ep-panel ep-activity"><div className="ep-panel__heading"><div><span className="ep-eyebrow">YOUR WORKSPACE</span><h2>Recent activity</h2></div><button className="ep-panel__link" onClick={() => setActiveTab('messages')} type="button">View messages <span>→</span></button></div><div className="ep-activity__empty"><span><Users size={19}/></span><p>Your expert activity will show here as you connect with organizations.</p></div></section>
+          </>}
+          {activeTab === 'projects' && <section className="ep-page-section">
+            <div className="ep-page-heading"><div><span className="ep-eyebrow">OPPORTUNITIES FOR YOUR EXPERTISE</span><h1>Browse Projects</h1><p>Explore published requests from companies and apply to projects that fit your experience.</p></div></div>
+            {projectError && <p className="ep-inline-alert" role="alert">{projectError}</p>}
+            {applicationNotice && <p className="ep-inline-success" role="status">{applicationNotice}</p>}
+            {projectsLoading ? showEmpty('Loading projects', 'Finding published projects from companies…', BriefcaseBusiness)
+              : visibleProjects.length === 0 ? showEmpty(search ? 'No matching projects' : 'No projects available yet', search ? 'Try a different search term.' : 'Published company projects will appear here when they become available.', BriefcaseBusiness)
+                : <div className="ep-project-list">{visibleProjects.map((project) => <article className="ep-panel ep-project-card" key={project.id}>
+                  <div className="ep-project-card__top"><div><span className="ep-project-category">{project.category}</span><h2>{project.title}</h2><p className="ep-project-company">{project.company_profile?.company_name || 'Company'}{project.company_profile?.industry ? ` · ${project.company_profile.industry}` : ''}</p></div><span className="ep-project-status">Open</span></div>
+                  <p className="ep-project-description">{project.description}</p>
+                  <div className="ep-project-tags">{(project.required_skills || []).map((skill) => <span key={skill}>{skill}</span>)}</div>
+                  <div className="ep-project-meta"><span><BriefcaseBusiness size={14}/>{project.budget || 'Budget negotiable'}</span><span><CalendarDays size={14}/>{project.expected_duration || 'Flexible duration'}</span><span><MapPin size={14}/>{project.work_arrangement || 'Arrangement flexible'}</span><span><Users size={14}/>{project.experts_needed || '1 expert'}</span></div>
+                  {project.additional_requirements && <details className="ep-project-requirements"><summary>Specific requirements</summary><p>{project.additional_requirements}</p></details>}
+                  <div className="ep-project-actions">{project.has_applied ? <span className="ep-applied-label"><Check size={15}/> Application sent</span> : <button className="ep-button ep-button--primary" onClick={() => { setApplicationProjectId(project.id); setResumeFile(null); setCoverLetter(''); setProposedBudget(''); setApplicationNotice(''); setProjectError(''); }} type="button"><Send size={15}/> Apply to project</button>}</div>
+                  {applicationProjectId === project.id && <form className="ep-application-form" onSubmit={(event) => submitApplication(event, project.id)}><h3>Your application</h3><label>Cover letter<textarea required minLength={30} maxLength={5000} onChange={(event) => setCoverLetter(event.target.value)} placeholder="Introduce your relevant experience and how you can help with this project…" value={coverLetter}/><small>{coverLetter.length}/5000 characters · At least 30 characters</small></label><label>CV or resume <b className="ep-required-mark">Required</b><input accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => setResumeFile(event.target.files?.[0] || null)} required type="file"/><small>{resumeFile ? `${resumeFile.name} · ${(resumeFile.size / 1024 / 1024).toFixed(1)} MB` : 'PDF, DOC, or DOCX · Maximum 10 MB'}</small></label><label>Proposed budget in LKR <span>(optional)</span><input min="0" onChange={(event) => setProposedBudget(event.target.value)} placeholder="e.g. 50000" step="0.01" type="number" value={proposedBudget}/></label><div><button className="ep-button ep-button--light" onClick={() => setApplicationProjectId(null)} type="button">Cancel</button><button className="ep-button ep-button--primary" disabled={submittingApplication} type="submit">{submittingApplication ? 'Sending…' : 'Send application'} <ArrowRight size={15}/></button></div></form>}
+                </article>)}</div>}
+          </section>}
+          {activeTab === 'applications' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">YOUR PROJECT ACTIVITY</span><h1>My Applications</h1><p>Track the project applications you have sent to companies.</p></div></div>{projectError && <p className="ep-inline-alert" role="alert">{projectError}</p>}{applicationsLoading ? showEmpty('Loading applications', 'Retrieving your project applications…', Send) : applications.length === 0 ? showEmpty('No applications yet', 'Browse projects and apply to opportunities that match your expertise.', Send) : <div className="ep-project-list">{applications.map((application) => <article className="ep-panel ep-application-card" key={application.id}><div className="ep-project-card__top"><div><span className="ep-project-category">{application.project?.category}</span><h2>{application.project?.title}</h2><p className="ep-project-company">{application.project?.company_profile?.company_name || 'Company'}</p></div><span className={`ep-application-status ep-application-status--${application.status}`}>{application.status}</span></div><p>{application.cover_letter}</p><div className="ep-project-meta"><span><BriefcaseBusiness size={14}/>{application.proposed_budget ? `LKR ${Number(application.proposed_budget).toLocaleString()}` : 'No proposed budget'}</span><span><FileText size={14}/>{application.resume_name || 'Resume attached'}</span><span><CalendarDays size={14}/>{new Date(application.created_at).toLocaleDateString()}</span></div></article>)}</div>}</section>}
+          {activeTab === 'profile' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">YOUR PROFESSIONAL PRESENCE</span><h1>My Profile</h1><p>Manage the details organizations see when they discover your expertise.</p></div><button className="ep-button ep-button--primary" onClick={openProfile} type="button">Edit profile <span>→</span></button></div><article className="ep-panel ep-public-profile"><span className="ep-avatar ep-avatar--large">{avatar}</span><div><span className="ep-eyebrow">EXPERT PROFILE</span><h2>{name}</h2><h3>{profile?.professional_title}</h3><p>{profile?.bio}</p><div className="ep-profile-meta">{profile?.location && <span>{profile.location}</span>}{profile?.years_of_experience != null && <span>{profile.years_of_experience} years of experience</span>}<span>{profile?.is_verified ? 'Verified expert' : 'Pending verification'}</span></div></div></article></section>}
+          {activeTab === 'bookings' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">YOUR SCHEDULE</span><h1>My Bookings</h1><p>Consultation requests and scheduled sessions will appear here.</p></div></div>{showEmpty('No bookings yet', 'When an organization requests a consultation, you’ll find the details here.', CalendarDays)}</section>}
+          {activeTab === 'messages' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">STAY CONNECTED</span><h1>Messages</h1><p>Your conversations with organizations will appear here.</p></div></div>{showEmpty('No messages yet', 'Messages will be available here when an organization reaches out.', MessageCircle)}</section>}
+          {activeTab === 'reviews' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">COMMUNITY FEEDBACK</span><h1>Reviews</h1><p>Feedback you receive after consultations will appear here.</p></div></div>{showEmpty('No reviews yet', 'Your reviews will appear here as you complete consultations.', Star)}</section>}
+          {activeTab === 'analytics' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">YOUR IMPACT</span><h1>Analytics</h1><p>Insights about your consultations and profile activity.</p></div></div>{showEmpty('Insights are on their way', 'Your expert activity insights will appear here as your profile gets started.', BarChart3)}</section>}
+          {activeTab === 'settings' && <section className="ep-page-section"><div className="ep-page-heading"><div><span className="ep-eyebrow">ACCOUNT PREFERENCES</span><h1>Settings</h1><p>Manage your ElderExpert account and session.</p></div></div><article className="ep-panel ep-settings-card"><div><b>Account email</b><span>{user?.email || 'Not available'}</span></div><button onClick={onLogout} type="button"><LogOut size={16}/> Sign out</button></article></section>}
         </main>
-
+        <footer className="ep-footer"><span>ElderExpert <i>•</i> Connect across generations</span><button onClick={onReturnHome} type="button">Back to home</button></footer>
       </div>
-
     </div>
   );
 }

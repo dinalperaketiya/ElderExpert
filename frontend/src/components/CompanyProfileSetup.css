@@ -1,0 +1,7 @@
+.company-setup-page .company-setup-card { width: min(100%, 560px); padding-top: 34px; }
+.company-setup-signout { min-height: 40px; padding: 0 16px; border: 1px solid #d8e1d9; border-radius: 999px; background: rgba(255,255,255,.7); color: #284d40; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.company-setup-signout:hover { border-color: #8caf94; background: #f2f7f0; }
+
+@media (max-width: 560px) {
+  .company-setup-page .company-setup-card { padding-top: 28px; }
+}

@@ -16,6 +16,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectApplicationController;
 
 
 // ==========================================
@@ -28,6 +30,10 @@ Route::get('/test', [TestController::class, 'test']);
 // Authentication
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/expert-profile-photos/{filename}', [ExpertProfileController::class, 'photo'])
+    ->where('filename', '[A-Za-z0-9._-]+');
+Route::get('/young-professional-profile-photos/{filename}', [YoungProfessionalProfileController::class, 'photo'])
+    ->where('filename', '[A-Za-z0-9._-]+');
 
 
 // ==========================================
@@ -45,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // EXPERTS
     // ======================================
 
+    Route::get('/experts/me', [ExpertProfileController::class, 'mine'])->middleware('role:expert');
     Route::get('/experts', [ExpertProfileController::class, 'index']);
     Route::get('/experts/{id}', [ExpertProfileController::class, 'show'])
         ->middleware('role:expert,admin');;
@@ -57,17 +64,28 @@ Route::middleware('auth:sanctum')->group(function () {
     // COMPANIES
     // ======================================
 
+    Route::get('/companies/me', [CompanyProfileController::class, 'mine']);
     Route::get('/companies', [CompanyProfileController::class, 'index']);
     Route::get('/companies/{id}', [CompanyProfileController::class, 'show']);
     Route::post('/companies', [CompanyProfileController::class, 'store']);
     Route::put('/companies/{id}', [CompanyProfileController::class, 'update']);
     Route::delete('/companies/{id}', [CompanyProfileController::class, 'destroy']);
 
+    // COMPANY PROJECTS
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+    Route::get('/applications/me', [ProjectApplicationController::class, 'mine']);
+    Route::get('/applications/company', [ProjectApplicationController::class, 'companyIndex']);
+    Route::get('/applications/{application}/resume', [ProjectApplicationController::class, 'resume']);
+    Route::post('/projects/{project}/applications', [ProjectApplicationController::class, 'store']);
+
 
     // ======================================
     // YOUNG PROFESSIONALS
     // ======================================
 
+    Route::get('/young-professionals/me', [YoungProfessionalProfileController::class, 'mine'])->middleware('role:young_professional');
     Route::get('/young-professionals', [YoungProfessionalProfileController::class, 'index']);
     Route::get('/young-professionals/{id}', [YoungProfessionalProfileController::class, 'show']);
     Route::post('/young-professionals', [YoungProfessionalProfileController::class, 'store']);

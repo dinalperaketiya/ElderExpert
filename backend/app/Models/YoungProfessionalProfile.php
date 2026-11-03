@@ -15,6 +15,15 @@ class YoungProfessionalProfile extends Model
         'profile_photo',
     ];
 
+    public function getProfilePhotoAttribute($value): ?string
+    {
+        if (!$value || str_starts_with($value, 'http')) {
+            return $value;
+        }
+
+        return url('/api/young-professional-profile-photos/'.basename($value));
+    }
+
     // A young professional profile belongs to one user
     public function user(): BelongsTo
     {

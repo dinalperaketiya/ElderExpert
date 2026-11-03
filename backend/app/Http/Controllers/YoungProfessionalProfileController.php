@@ -4,9 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\YoungProfessionalProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class YoungProfessionalProfileController extends Controller
 {
+    public function mine(Request $request)
+    {
+        if ($request->user()->role !== 'young_professional') {
+            return response()->json(['message' => 'Only young professional users can view this profile.'], 403);
+        }
+
+        return response()->json([
+            'data' => YoungProfessionalProfile::with('user')->where('user_id', $request->user()->id)->first(),
+        ]);
+    }
+
+    public function photo(string $filename)
+    {
+        abort_unless(preg_match('/^[A-Za-z0-9._-]+$/', $filename) === 1, 404);
+        $path = 'young-professional-profiles/'.$filename;
+        abort_unless(Storage::disk('public')->exists($path), 404);
+
+        return response()->file(Storage::disk('public')->path($path));
+    }
+
     // Get all young professional profiles
     public function index()
     {
@@ -46,8 +67,12 @@ class YoungProfessionalProfileController extends Controller
             'professional_title' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
             'location' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|string|max:255',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        if ($request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $request->file('profile_photo')->store('young-professional-profiles', 'public');
+        }
 
         // Automatically use the logged-in user's ID
         $validated['user_id'] = $user->id;
@@ -83,8 +108,16 @@ class YoungProfessionalProfileController extends Controller
             'professional_title' => 'sometimes|nullable|string|max:255',
             'bio' => 'sometimes|nullable|string',
             'location' => 'sometimes|nullable|string|max:255',
-            'profile_photo' => 'sometimes|nullable|string|max:255',
+            'profile_photo' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        if ($request->hasFile('profile_photo')) {
+            $oldPhoto = $profile->getRawOriginal('profile_photo');
+            $validated['profile_photo'] = $request->file('profile_photo')->store('young-professional-profiles', 'public');
+            if ($oldPhoto && !str_starts_with($oldPhoto, 'http')) {
+                Storage::disk('public')->delete($oldPhoto);
+            }
+        }
 
         $profile->update($validated);
 

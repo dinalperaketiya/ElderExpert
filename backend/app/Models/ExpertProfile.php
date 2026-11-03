@@ -18,6 +18,16 @@ class ExpertProfile extends Model
         'is_verified',
     ];
 
+    public function getProfilePhotoAttribute($value): ?string
+    {
+        if (!$value || str_starts_with($value, 'http')) {
+            return $value;
+        }
+
+        $filename = basename($value);
+        return url('/api/expert-profile-photos/'.$filename);
+    }
+
     // An expert profile belongs to one user
     public function user(): BelongsTo
     {
