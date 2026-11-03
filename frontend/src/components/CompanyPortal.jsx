@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ProjectCreationWizard from './ProjectCreationWizard';
-import { projectApi } from '../services/api';
+import { applicationApi, projectApi } from '../services/api';
 import {
   LayoutDashboard, Search, Briefcase, Calendar, MessageSquare,
   Bookmark, Star, Building2, Settings,
   Bell, Filter, SortAsc, MapPin, Clock,
   Users, TrendingUp, Activity,
-  X, Send, Menu, Plus, LogOut, ArrowRight, BarChart3, FileText, CircleCheck, Monitor, Leaf
+  X, Send, Menu, Plus, LogOut, ArrowRight, BarChart3, Download, FileText, CircleCheck, Monitor, Leaf
 } from 'lucide-react';
 import './CompanyPortal.css';
 import './BrandLogo.css';
@@ -492,6 +492,61 @@ function ViewProjects() {
   );
 }
 
+function ViewApplications() {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    applicationApi.companyMine()
+      .then(({ data }) => { if (active) setApplications(data.data || []); })
+      .catch((requestError) => { if (active) setError(requestError.response?.data?.message || 'Could not load project applications. Please try again.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  const downloadResume = async (application) => {
+    setDownloadingId(application.id);
+    setError('');
+    try {
+      const { data } = await applicationApi.downloadResume(application.id);
+      const fileUrl = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = application.resume_name || 'expert-resume';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(fileUrl);
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Could not download this resume. Please try again.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  return (
+    <div className="cp-view cp-view--applications">
+      <div className="cp-projects-heading"><div><span className="cp-projects-eyebrow">EXPERT RESPONSES</span><h1>Project Applications</h1><p>Review expert applications and their CVs for your published projects.</p></div></div>
+      {error && <p className="cp-application-alert" role="alert">{error}</p>}
+      {loading ? <section className="cp-project-empty"><h2>Loading applications…</h2></section>
+        : applications.length === 0 ? <section className="cp-project-empty"><div className="cp-project-empty__art"><FileText size={76} strokeWidth={1.3}/></div><h2>No applications yet</h2><p>When an expert applies to one of your projects, their application and CV will appear here.</p></section>
+          : <div className="cp-application-list">{applications.map((application) => {
+            const expert = application.expert_profile;
+            const applicantName = expert?.user?.name || 'ElderExpert member';
+            return <article className="cp-application-card" key={application.id}>
+              <header><div><span className="cp-project-card__domain">{application.project?.category || 'Project'}</span><h2>{application.project?.title || 'Project'}</h2><p>Applicant: <strong>{applicantName}</strong>{expert?.professional_title ? ` · ${expert.professional_title}` : ''}</p></div><span className="cp-application-status">{application.status}</span></header>
+              <div className="cp-application-profile">{expert?.user?.email && <span>{expert.user.email}</span>}{expert?.location && <span>{expert.location}</span>}{expert?.years_of_experience != null && <span>{expert.years_of_experience} years of experience</span>}</div>
+              <section><h3>Cover letter</h3><p>{application.cover_letter}</p></section>
+              <footer><span><FileText size={16}/>{application.resume_name || 'CV or resume attached'}</span><button className="cp-btn cp-btn--primary" disabled={downloadingId === application.id} onClick={() => downloadResume(application)} type="button"><Download size={15}/>{downloadingId === application.id ? 'Downloading…' : 'Download CV / Resume'}</button></footer>
+            </article>;
+          })}</div>}
+    </div>
+  );
+}
+
 // ─── View: Bookings ───────────────────────────────────────────────────────────
 
 function ViewBookings() {
@@ -881,6 +936,7 @@ const NAV_ITEMS = [
   { id: 'overview',         label: 'Dashboard',       icon: LayoutDashboard },
   { id: 'find-experts',     label: 'Find Experts',    icon: Search          },
   { id: 'projects',         label: 'My Projects',     icon: Briefcase },
+  { id: 'applications',     label: 'Applications',    icon: FileText       },
   { id: 'bookings',         label: 'Bookings',        icon: Calendar },
   { id: 'messages',         label: 'Messages',        icon: MessageSquare },
   { id: 'saved-experts',    label: 'Saved Experts',   icon: Bookmark        },
@@ -918,6 +974,7 @@ export default function CompanyPortal({ onReturnHome, onSelectExpert, onLogout, 
       case 'overview':        return <ViewOverview       {...sharedProps} companyProfile={companyProfile} onNav={navTo} />;
       case 'find-experts':    return <ViewFindExperts    {...sharedProps} />;
       case 'projects':        return <ViewProjects />;
+      case 'applications':    return <ViewApplications />;
       case 'bookings':        return <ViewBookings />;
       case 'messages':        return <ViewMessages />;
       case 'saved-experts':   return <ViewSavedExperts   {...sharedProps} />;

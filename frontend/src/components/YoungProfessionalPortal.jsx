@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Award, Bell, Bookmark, BriefcaseBusiness, CalendarDays, ChevronDown, CircleUserRound, FileText, GraduationCap, HelpCircle, Home, MapPin, MessageCircle, Search, Settings, Sparkles, UserRound, Users } from 'lucide-react';
+import { ArrowRight, Award, Bell, Bookmark, BriefcaseBusiness, CalendarDays, ChevronDown, CircleUserRound, FileText, GraduationCap, HelpCircle, Home, LogOut, MapPin, MessageCircle, Search, Settings, Sparkles, UserRound, Users } from 'lucide-react';
 import './YoungProfessionalPortal.css';
 import './ProfilePhotoCrop.css';
 import './BrandLogo.css';
@@ -35,7 +35,7 @@ export default function YoungProfessionalPortal({ user, profile, onEditProfile, 
       </aside>
 
       <div className="yp-content">
-        <header className="yp-header"><label className="yp-search"><Search size={17}/><input aria-label="Search the portal" placeholder="Search experts, skills, or opportunities…"/><kbd>⌘ K</kbd></label><div className="yp-header__actions"><button className="yp-icon-button" aria-label="Notifications" type="button"><Bell size={18}/></button><button className="yp-account" onClick={() => setActiveTab('profile')} type="button"><span className="yp-avatar">{avatar}</span><span><b>{name}</b><small>Young professional</small></span><ChevronDown size={15}/></button></div></header>
+        <header className="yp-header"><label className="yp-search"><Search size={17}/><input aria-label="Search the portal" placeholder="Search experts, skills, or opportunities…"/><kbd>⌘ K</kbd></label><div className="yp-header__actions"><button className="yp-icon-button" aria-label="Notifications" type="button"><Bell size={18}/></button><button className="yp-account" onClick={() => setActiveTab('profile')} type="button"><span className="yp-avatar">{avatar}</span><span><b>{name}</b><small>Young professional</small></span><ChevronDown size={15}/></button><button className="yp-logout" onClick={onLogout} type="button" title="Sign out"><LogOut size={16}/><span>Sign out</span></button></div></header>
         <main className="yp-main">
           {activeTab === 'dashboard' && <>
             <section className="yp-welcome"><div className="yp-welcome__copy"><span className="yp-eyebrow">YOUR YOUNG PROFESSIONAL SPACE</span><h1>Welcome, {name.split(' ')[0]} <span>✦</span></h1><p>Build connections, learn from experience, and take the next step in your professional journey.</p><div className="yp-welcome__actions"><button className="yp-button yp-button--primary" onClick={editProfile} type="button"><UserRound size={16}/> {completion < 100 ? 'Complete your profile' : 'Update your profile'} <ArrowRight size={15}/></button><button className="yp-button yp-button--light" onClick={() => setActiveTab('browse')} type="button"><Search size={16}/> Explore the community</button></div></div><div className="yp-welcome__art" aria-hidden="true"><div className="yp-art-ring yp-art-ring--one"/><div className="yp-art-ring yp-art-ring--two"/><span className="yp-art-star">✦</span><div className="yp-art-note"><GraduationCap size={29}/><b>Learn from<br/>experience</b></div></div></section>

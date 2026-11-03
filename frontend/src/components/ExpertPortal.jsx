@@ -72,7 +72,11 @@ export default function ExpertPortal({ onReturnHome, onLogout, onEditProfile, us
       setCoverLetter('');
       setResumeFile(null);
       setProposedBudget('');
-      setApplicationNotice('Your application was sent to the company.');
+      setApplicationNotice(data.emails_sent === 2
+        ? 'Application sent successfully. Confirmation emails were sent to you and the company.'
+        : data.emails_sent === 1
+          ? 'Application sent successfully. One notification email could not be delivered.'
+          : 'Application sent successfully. Email delivery is not configured yet.');
     } catch (error) {
       setProjectError(error.response?.data?.errors?.cover_letter?.[0] || error.response?.data?.errors?.resume?.[0] || error.response?.data?.errors?.proposed_budget?.[0] || error.response?.data?.message || 'Could not submit your application. Please try again.');
     } finally {
@@ -107,7 +111,7 @@ export default function ExpertPortal({ onReturnHome, onLogout, onEditProfile, us
       <div className="ep-content">
         <header className="ep-header">
           <label className="ep-search"><Search size={17}/><input aria-label="Search your portal" onChange={(event) => setSearch(event.target.value)} placeholder="Search your portal…" value={search}/><kbd>⌘ K</kbd></label>
-          <div className="ep-header__actions"><button className="ep-icon-button" aria-label="Notifications" type="button"><Bell size={18}/><i/></button><button className="ep-account" onClick={() => setActiveTab('profile')} type="button"><span className="ep-avatar">{avatar}</span><span><b>{name}</b><small>Expert</small></span><ChevronDown size={15}/></button></div>
+          <div className="ep-header__actions"><button className="ep-icon-button" aria-label="Notifications" type="button"><Bell size={18}/><i/></button><button className="ep-account" onClick={() => setActiveTab('profile')} type="button"><span className="ep-avatar">{avatar}</span><span><b>{name}</b><small>Expert</small></span><ChevronDown size={15}/></button><button className="ep-logout" onClick={onLogout} type="button" title="Sign out"><LogOut size={16}/><span>Sign out</span></button></div>
         </header>
 
         <main className="ep-main">

@@ -49,6 +49,11 @@ export const projectApi = {
   apply: (id, application) => api.post(`/projects/${id}/applications`, application, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
 };
 
+export const applicationApi = {
+  companyMine: () => api.get('/applications/company'),
+  downloadResume: (id) => api.get(`/applications/${id}/resume`, { responseType: 'blob', timeout: 60000 }),
+};
+
 export const expertProfileApi = {
   mine: () => api.get('/experts/me'),
   create: (profile) => api.post('/experts', profile, { headers: { 'Content-Type': 'multipart/form-data' } }),

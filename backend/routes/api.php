@@ -76,6 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store']);
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
     Route::get('/applications/me', [ProjectApplicationController::class, 'mine']);
+    Route::get('/applications/company', [ProjectApplicationController::class, 'companyIndex']);
+    Route::get('/applications/{application}/resume', [ProjectApplicationController::class, 'resume']);
     Route::post('/projects/{project}/applications', [ProjectApplicationController::class, 'store']);
 
 

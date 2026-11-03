@@ -36,3 +36,52 @@
 
 .ep-project-list{display:grid;gap:14px}.ep-project-card{padding:20px}.ep-project-card__top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.ep-project-category{color:#4b7a60;font-size:9px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}.ep-project-card__top h2{margin:5px 0 3px;color:#19382f;font-family:'Playfair Display',Georgia,serif;font-size:20px}.ep-project-company{margin:0;color:#78867e;font-size:12px}.ep-project-status,.ep-application-status{flex:0 0 auto;padding:6px 10px;border-radius:99px;background:#e8f5eb;color:#267247;font-size:10px;font-weight:700;text-transform:capitalize}.ep-application-status--pending{background:#fff4dd;color:#9a6513}.ep-project-description{margin:14px 0;color:#5f7168;font-size:13px;line-height:1.65;white-space:pre-wrap}.ep-project-tags{display:flex;flex-wrap:wrap;gap:7px}.ep-project-tags span{padding:6px 9px;border-radius:99px;background:#eef5ef;color:#456b50;font-size:10px;font-weight:600}.ep-project-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:15px;padding-top:13px;border-top:1px solid #edf0eb}.ep-project-meta span{display:flex;align-items:center;gap:6px;color:#687a70;font-size:11px}.ep-project-meta svg{color:#51805d}.ep-project-requirements{margin-top:14px;color:#466351;font-size:12px}.ep-project-requirements summary{cursor:pointer;font-weight:700}.ep-project-requirements p{color:#718078;line-height:1.6;white-space:pre-wrap}.ep-project-actions{display:flex;justify-content:flex-end;margin-top:14px}.ep-applied-label{display:inline-flex;align-items:center;gap:6px;color:#267247;font-size:12px;font-weight:700}.ep-inline-alert,.ep-inline-success{margin:0 0 14px;padding:11px 13px;border:1px solid #f2d0cc;border-radius:10px;background:#fff7f6;color:#a33e35;font-size:12px}.ep-inline-success{border-color:#c8e4cf;background:#f2faf3;color:#287249}.ep-application-form{display:grid;gap:13px;margin-top:17px;padding:16px;border:1px solid #e3eae1;border-radius:12px;background:#f8faf7}.ep-application-form h3{margin:0;color:#19382f;font-family:'Playfair Display',Georgia,serif;font-size:17px}.ep-application-form label{display:grid;gap:6px;color:#355344;font-size:11px;font-weight:700}.ep-application-form label>span{color:#829087;font-weight:400}.ep-application-form textarea,.ep-application-form input{width:100%;padding:10px 11px;border:1px solid #dfe7df;border-radius:8px;background:#fff;color:#233f33;font:inherit;font-size:12px}.ep-application-form textarea{min-height:105px;resize:vertical}.ep-application-form label small{color:#829087;font-size:10px;font-weight:400}.ep-application-form>div{display:flex;justify-content:flex-end;gap:8px}.ep-application-form .ep-button:disabled{opacity:.65;cursor:wait}.ep-application-card>p{color:#5f7168;font-size:12px;line-height:1.6;white-space:pre-wrap}
 .ep-application-form input[type=file]{padding:8px;background:#fff;font-size:11px}.ep-application-form input[type=file]::file-selector-button{margin-right:10px;padding:7px 10px;border:1px solid #dce6dc;border-radius:7px;background:#f5f9f5;color:#315942;font:inherit;font-weight:700;cursor:pointer}.ep-required-mark{color:#b2483f;font-size:10px}
+
+/* Match the company portal sidebar treatment. */
+.ep-sidebar{flex-basis:240px;padding:16px 10px 12px;background:linear-gradient(180deg,#0d3b32,#092e28)}
+.ep-brand{padding:4px 8px 18px;border-bottom-color:rgba(255,255,255,.12)}
+.ep-brand small{color:#b3cfc2}
+.ep-nav{gap:2px;margin-top:8px}
+.ep-nav__item{min-height:39px;gap:10px;padding:9px 10px;border-radius:9px;color:#d2e2d9;font-size:12px}
+.ep-nav__item:hover{background:rgba(255,255,255,.11);color:#fff}
+.ep-nav__item.is-active{border-left:2px solid #b9e5a9;background:rgba(255,255,255,.16);color:#fff;font-weight:600}
+.ep-nav__item.is-active:before{display:none}
+.ep-help{padding:12px 10px;border-radius:12px}
+.ep-sidebar__user{margin-top:12px;padding:9px;border-radius:10px}
+@media(max-width:900px){.ep-sidebar{flex-basis:220px}}
+@media(max-width:760px){.ep-sidebar{flex-basis:68px;padding:15px 8px}.ep-nav{gap:5px;margin-top:16px}.ep-nav__item{min-height:43px;padding:0;border-left:0!important}.ep-nav__item.is-active:before{display:block}}
+@media(max-width:520px){.ep-sidebar{flex-basis:55px;padding-inline:5px}}
+
+/* Match the company portal top bar: centered search and right-aligned account actions. */
+.ep-header{height:62px;padding:0 24px}
+.ep-search{position:absolute;left:50%;width:min(410px,calc(100% - 360px));height:42px;padding:0 14px;border-radius:14px;background:linear-gradient(110deg,#fff 0%,#fbfdfb 62%,#f4faf5 100%);transform:translateX(-50%);box-shadow:0 2px 6px rgba(12,45,38,.035),inset 0 1px 0 rgba(255,255,255,.9)}
+.ep-search svg{flex:0 0 auto;width:17px;height:17px;padding:7px;box-sizing:content-box;border-radius:10px;background:#edf6ef;color:#0d4937}
+.ep-search input{font-size:12px}
+.ep-header__actions{gap:10px;margin-left:auto}
+.ep-logout,.yp-logout{display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border:1px solid #e2e9e5;border-radius:10px;background:#fff;color:#33483e;font:inherit;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.ep-logout:hover,.yp-logout:hover{border-color:#b7d2c2;background:#f5faf6;color:#0d4937}
+@media(max-width:1100px){.ep-search{width:min(360px,calc(100% - 340px))}}
+@media(max-width:760px){.ep-header{height:60px;padding:0 16px}.ep-search{left:16px;width:min(370px,calc(100% - 255px));transform:none}}
+@media(max-width:520px){.ep-header{padding:0 10px}.ep-search{left:10px;width:auto;right:145px}.ep-search kbd{display:none}.ep-header__actions{gap:4px}.ep-logout{width:34px;min-height:34px;padding:0}.ep-logout span{display:none}}
+
+/* Pin account controls to the upper-right, immediately before sign out. */
+.ep-header,.yp-header{position:sticky;isolation:isolate}
+.ep-header__actions,.yp-header__actions{position:absolute;top:50%;right:24px;display:flex;align-items:center;justify-content:flex-end;margin:0;transform:translateY(-50%)}
+@media(max-width:760px){.ep-header__actions{right:16px}}
+@media(max-width:800px){.yp-header__actions{right:15px}}
+@media(max-width:520px){.ep-header__actions{right:10px}}
+@media(max-width:560px){.yp-header__actions{right:9px}}
+
+/* Match the company account cluster shown in the reference. */
+.ep-account,.yp-account{gap:9px;padding:3px 0}
+.ep-account>.ep-avatar,.yp-account>.yp-avatar{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:12px;background:#0d4937;box-shadow:none;color:#e5f4df;font-size:13px}
+.ep-account>.ep-avatar img,.yp-account>.yp-avatar img{border-radius:12px}
+.ep-account>svg,.yp-account>svg{display:none}
+.ep-account b,.yp-account b{font-size:12px}
+.ep-account small,.yp-account small{margin-top:2px;font-size:10px}
+.ep-logout,.yp-logout{min-height:40px;padding:0 12px;border-radius:10px;font-size:12px}
+@media(max-width:520px){.ep-account>.ep-avatar,.yp-account>.yp-avatar{flex-basis:36px;width:36px;height:36px;border-radius:11px}.ep-account>.ep-avatar img,.yp-account>.yp-avatar img{border-radius:11px}.ep-account b,.yp-account b{font-size:11px}}
+
+/* Keep uploaded headshots clipped cleanly to the avatar frame and centered on the face. */
+.ep-avatar,.yp-avatar{overflow:hidden}
+.ep-account>.ep-avatar img,.yp-account>.yp-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 26%;border-radius:inherit}

@@ -6,3 +6,47 @@
 @media(max-width:560px){.yp-sidebar{flex-basis:54px;padding-inline:5px}.yp-brand__mark{width:32px;height:32px}.yp-nav__item{min-height:39px}.yp-header{padding:0 9px}.yp-search{flex:1;width:auto;min-width:0;padding-inline:9px}.yp-search input{font-size:9px}.yp-search kbd{display:none}.yp-header__actions{gap:5px}.yp-account>span:nth-child(2),.yp-account>svg{display:none}.yp-main{padding:13px 10px}.yp-welcome{min-height:220px;padding:20px}.yp-welcome__copy{max-width:100%}.yp-welcome h1{font-size:27px}.yp-welcome__copy>p{max-width:270px;font-size:11px}.yp-welcome__art{right:-14%;width:55%;opacity:.3}.yp-welcome__actions{position:relative;z-index:2;gap:7px}.yp-button{min-height:35px;padding-inline:9px;font-size:9px}.yp-profile-banner__cover{min-height:75px;padding:12px}.yp-profile-banner__cover span{font-size:15px}.yp-profile-banner__body{flex-wrap:wrap;gap:10px;padding:12px}.yp-avatar--profile{flex-basis:58px;width:58px;height:58px;margin-top:-38px}.yp-profile-banner__details{flex:1 1 calc(100% - 75px)}.yp-profile-banner__details h2{font-size:17px}.yp-profile-banner__details p{font-size:9px}.yp-outline-button{margin-left:68px;min-height:32px}.yp-metrics{grid-template-columns:1fr;gap:8px;margin-top:10px}.yp-metric{min-height:65px}.yp-dashboard-grid{gap:10px;margin-top:10px}.yp-dashboard-aside{grid-template-columns:1fr}.yp-card{padding:15px}.yp-page__heading{align-items:flex-start;flex-direction:column}.yp-page__heading h1{font-size:27px}.yp-full-profile{flex-direction:column}.yp-footer{padding:0 10px 13px;font-size:8px}}
 @media(max-width:600px){.yp-setup{padding:0 13px 28px}.yp-setup__top{height:65px}.yp-setup__card{margin-top:16px;padding:25px 18px;border-radius:18px}.yp-setup__intro h1{font-size:30px}.yp-setup__photo{align-items:flex-start;padding:12px}.yp-setup__photo-preview{flex-basis:42px;width:42px;height:42px}}
 @media(prefers-reduced-motion:reduce){.yp-root *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Match the company portal sidebar treatment. */
+.yp-sidebar{flex-basis:240px;padding:16px 10px 12px;background:linear-gradient(180deg,#0d3b32,#092e28)}
+.yp-brand{padding:4px 8px 18px;border-bottom-color:rgba(255,255,255,.12)}
+.yp-brand small{color:#b3cfc2}
+.yp-nav{gap:2px;margin-top:8px}
+.yp-nav__item{min-height:39px;gap:10px;padding:9px 10px;border-radius:9px;color:#d2e2d9;font-size:12px}
+.yp-nav__item:hover{background:rgba(255,255,255,.11);color:#fff}
+.yp-nav__item.is-active{border-left:2px solid #b9e5a9;background:rgba(255,255,255,.16);color:#fff;font-weight:600}
+.yp-nav__item.is-active:before{display:none}
+.yp-help{padding:12px 10px;border-radius:12px}
+.yp-sidebar__user{margin-top:12px;padding:9px;border-radius:10px}
+@media(max-width:900px){.yp-sidebar{flex-basis:220px}}
+@media(max-width:800px){.yp-sidebar{flex-basis:68px;padding:14px 8px}.yp-nav{gap:5px;margin-top:15px}.yp-nav__item{min-height:42px;padding:0;border-left:0!important}.yp-nav__item.is-active:before{display:block}}
+@media(max-width:560px){.yp-sidebar{flex-basis:54px;padding-inline:5px}}
+
+/* Match the company portal top bar: centered search and right-aligned account actions. */
+.yp-header{height:62px;padding:0 24px}
+.yp-search{position:absolute;left:50%;width:min(410px,calc(100% - 360px));height:42px;padding:0 14px;border-radius:14px;background:linear-gradient(110deg,#fff 0%,#fbfdfb 62%,#f4faf5 100%);transform:translateX(-50%);box-shadow:0 2px 6px rgba(12,45,38,.035),inset 0 1px 0 rgba(255,255,255,.9)}
+.yp-search svg{flex:0 0 auto;width:17px;height:17px;padding:7px;box-sizing:content-box;border-radius:10px;background:#edf6ef;color:#0d4937}
+.yp-search input{font-size:12px}
+.yp-header__actions{gap:10px;margin-left:auto}
+.yp-logout:hover{border-color:#b7d2c2;background:#f5faf6;color:#0d4937}
+@media(max-width:1100px){.yp-search{width:min(360px,calc(100% - 340px))}}
+@media(max-width:800px){.yp-header{height:60px;padding:0 15px}.yp-search{left:15px;width:min(370px,calc(100% - 255px));transform:none}}
+@media(max-width:560px){.yp-header{padding:0 9px}.yp-search{left:9px;right:130px;width:auto}.yp-search kbd{display:none}.yp-header__actions{gap:3px}.yp-logout{width:32px;min-height:32px;padding:0}.yp-logout span{display:none}}
+
+/* Account controls fill the space immediately before the right-aligned Sign out button. */
+.ep-header__actions,.yp-header__actions{gap:10px}
+.ep-logout,.yp-logout{flex:0 0 auto}
+
+/* Match the company account cluster shown in the reference. */
+.yp-account{gap:9px;padding:3px 0}
+.yp-account>.yp-avatar{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:12px;background:#0d4937;box-shadow:none;color:#e5f4df;font-size:13px}
+.yp-account>.yp-avatar img{border-radius:12px}
+.yp-account>svg{display:none}
+.yp-account b{font-size:12px}
+.yp-account small{margin-top:2px;font-size:10px}
+.yp-logout{min-height:40px;padding:0 12px;border-radius:10px;font-size:12px}
+@media(max-width:560px){.yp-account>.yp-avatar{flex-basis:36px;width:36px;height:36px;border-radius:11px}.yp-account>.yp-avatar img{border-radius:11px}.yp-account b{font-size:11px}}
+
+/* Keep uploaded headshots clipped cleanly to the avatar frame and centered on the face. */
+.yp-avatar{overflow:hidden}
+.yp-account>.yp-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 26%;border-radius:inherit}
